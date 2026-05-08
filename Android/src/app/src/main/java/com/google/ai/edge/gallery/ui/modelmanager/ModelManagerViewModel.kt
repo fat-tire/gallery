@@ -36,6 +36,7 @@ import com.google.ai.edge.gallery.data.Category
 import com.google.ai.edge.gallery.data.CategoryInfo
 import com.google.ai.edge.gallery.data.Config
 import com.google.ai.edge.gallery.data.ConfigKeys
+import com.google.ai.edge.gallery.data.DEFAULT_REPO_NAME
 import com.google.ai.edge.gallery.data.DataStoreRepository
 import com.google.ai.edge.gallery.data.DownloadRepository
 import com.google.ai.edge.gallery.data.EMPTY_MODEL
@@ -53,7 +54,6 @@ import com.google.ai.edge.gallery.data.TMP_FILE_EXT
 import com.google.ai.edge.gallery.data.Task
 import com.google.ai.edge.gallery.data.ValueType
 import com.google.ai.edge.gallery.data.createLlmChatConfigs
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.proto.AccessTokenData
 import com.google.ai.edge.gallery.proto.ImportedModel
 import com.google.ai.edge.gallery.proto.Theme
@@ -84,8 +84,10 @@ private const val TAG = "AGModelManagerViewModel"
 private const val TEXT_INPUT_HISTORY_MAX_SIZE = 50
 private const val MODEL_ALLOWLIST_FILENAME = "model_allowlist.json"
 private const val MODEL_ALLOWLIST_TEST_FILENAME = "model_allowlist_test.json"
-private const val ALLOWLIST_BASE_URL =
-  "https://raw.githubusercontent.com/google-ai-edge/gallery/refs/heads/main/model_allowlists"
+private const val ALLOWLIST_BASE_URL_1 =
+  "https://raw.githubusercontent.com/"
+private const val ALLOWLIST_BASE_URL_2 =
+  "/gallery/refs/heads/main/model_allowlists"
 
 private const val TEST_MODEL_ALLOW_LIST = ""
 
@@ -637,7 +639,6 @@ constructor(
    */
   fun saveFirebaseAnalytics(enabled: Boolean) {
     dataStoreRepository.saveFirebaseAnalytics(enabled = enabled)
-    firebaseAnalytics?.setAnalyticsCollectionEnabled(enabled)
   }
 
   fun getModelUrlResponse(model: Model, accessToken: String? = null): Int {
@@ -928,10 +929,20 @@ constructor(
     }
   }
 
+
+  fun saveRepoName(repoName: String) {
+    dataStoreRepository.saveRepoName(repoName)
+  }
+
+  fun getRepoName() : String {
+    return dataStoreRepository.getRepoName()
+  }
+
   fun loadModelAllowlist() {
     _uiState.update { it.copy(loadingModelAllowlist = true, loadingModelAllowlistError = "") }
 
     viewModelScope.launch(Dispatchers.IO) {
+
       try {
         // Clear existing allowlist models.
         _allowlistModels.clear()
@@ -955,7 +966,7 @@ constructor(
         if (modelAllowlist == null) {
           // Load from github.
           var version = BuildConfig.VERSION_NAME.replace(".", "_")
-          val url = getAllowlistUrl(version)
+          val url = getAllowlistUrl(version, getRepoName())
           Log.d(TAG, "Loading model allowlist from internet. Url: $url")
           val data = getJsonResponse<ModelAllowlist>(url = url)
           modelAllowlist = data?.jsonObj
@@ -1534,6 +1545,10 @@ constructor(
   }
 }
 
-private fun getAllowlistUrl(version: String): String {
-  return "$ALLOWLIST_BASE_URL/${version}.json"
+private fun getAllowlistUrl(version: String, repoName: String): String {
+  var repo = repoName
+  if (repo == "") {
+    repo = DEFAULT_REPO_NAME
+  }
+  return "$ALLOWLIST_BASE_URL_1$repo$ALLOWLIST_BASE_URL_2/${version}.json"
 }

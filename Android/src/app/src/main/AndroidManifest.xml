@@ -16,13 +16,7 @@
 -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.ai.edge.gallery"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-sdk
-        android:minSdkVersion="31"
-        android:compileSdkVersion ="37"
-        android:targetSdkVersion="37" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
@@ -45,6 +39,11 @@
     <!-- Required before JellyBean MR1, optional for newer versions of Android. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
+    <!-- no tracking ad id access -->
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -54,18 +53,90 @@
 
     <application
         android:name="${applicationName}"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
+        android:fullBackupContent="false"
         android:icon="${appIcon}"
         android:label="Edge Gallery"
         android:roundIcon="${appIcon}"
         android:supportsRtl="true"
         android:theme="@style/Theme.Gallery"
-        tools:targetApi="31">
+        tools:targetApi="37">
         <uses-native-library android:name="libedgetpu_util.so" android:required="false" />
         <uses-native-library android:name="libedgetpu_tachyon.google.so" android:required="false" />
         <uses-native-library android:name="libedgetpu_client.google.so" android:required="false" />
+
+        <!-- tell mlkit not to automatically download model dependencies
+         on install and don't log anything -->
+
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="none" />
+
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="none" />
+
+        <!-- tell mlkit not to log anything -->
+
+        <meta-data
+            android:name="com.google.mlkit.vision.OPT_OUT_LOGGING"
+            android:value="true" />
+
+        <meta-data
+            android:name="com.google.mlkit.nlp.OPT_OUT_LOGGING"
+            android:value="true" />
+
+        <!-- tell any firebase dependencies & google analytics not to log anything -->
+
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true"
+            tools:replace="android:value" />
+
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false"
+            tools:replace="android:value" />
+
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false"
+            tools:replace="android:value" />
+
+        <!-- strip out google's datatransfer service -->
+
+        <service
+            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+            tools:node="remove" />
+
+        <!-- Block Firebase Analytics components from merging into build -->
+
+        <receiver
+            android:name="com.google.android.gms.measurement.AppMeasurementInstallReferrerReceiver"
+            tools:ignore="MissingClass"
+            tools:node="remove" />
+
+        <receiver
+            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
+            tools:ignore="MissingClass"
+            tools:node="remove" />
+
+        <service
+            android:name="com.google.android.gms.measurement.AppMeasurementService"
+            tools:ignore="MissingClass"
+            tools:node="remove" />
+        <service
+            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
+            tools:ignore="MissingClass"
+            tools:node="remove" />
+
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove"
+            tools:ignore="MissingClass" />
+
         <!--
           android:configChanges="uiMode" tells the system don't destroy and
           recreate the activity when UI mode changes (e.g. setting dark mode).
@@ -123,43 +194,6 @@
             tools:node="merge">
         </service>
 
-        <!-- For Firebase Analytics. -->
-        <receiver
-            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <service android:name="com.google.android.gms.measurement.AppMeasurementService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service
-            android:name=".GalleryFcmMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
-        <receiver
-            android:name="com.google.ai.edge.gallery.notifications.NotificationReceiver"
-            android:exported="false" />
-
-        <receiver
-            android:name="com.google.ai.edge.gallery.notifications.BootReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="gallery_high_priority_push_channel" />
         <uses-native-library android:name="libvndksupport.so" android:required="false"/>
         <uses-native-library android:name="libOpenCL.so" android:required="false"/>
         <uses-native-library android:name="libcdsprpc.so" android:required="false" />

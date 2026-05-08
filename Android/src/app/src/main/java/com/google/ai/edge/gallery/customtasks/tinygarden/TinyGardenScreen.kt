@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.ConsoleMessage
@@ -91,14 +92,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.webkit.WebViewAssetLoader
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.data.ConfigKeys
 import com.google.ai.edge.gallery.data.ModelDownloadStatusType
 import com.google.ai.edge.gallery.data.Task
 import com.google.ai.edge.gallery.data.ValueType
 import com.google.ai.edge.gallery.data.convertValueToTargetType
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.ui.common.chat.ChatMessageText
 import com.google.ai.edge.gallery.ui.common.chat.ChatMessageWarning
 import com.google.ai.edge.gallery.ui.common.chat.ChatSide
@@ -109,7 +108,6 @@ import com.google.ai.edge.gallery.ui.common.textandvoiceinput.VoiceRecognizerOve
 import com.google.ai.edge.gallery.ui.modelmanager.ModelManagerViewModel
 import com.google.ai.edge.gallery.ui.theme.customColors
 import com.google.ai.edge.litertlm.ToolProvider
-import com.google.common.io.BaseEncoding
 import java.security.MessageDigest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -398,13 +396,6 @@ fun MainUi(
         )
       }
 
-      firebaseAnalytics?.logEvent(
-        GalleryEvent.GENERATE_ACTION.id,
-        Bundle().apply {
-          putString("capability_name", task.id)
-          putString("model_id", model.name)
-        },
-      )
     }
   }
 
@@ -735,7 +726,7 @@ private fun String.sha256(): String {
   return try {
     val sha256 = MessageDigest.getInstance("SHA-256")
     val digest = sha256.digest(inputBytes)
-    BaseEncoding.base64().encode(digest)
+    Base64.encodeToString(digest, Base64.NO_WRAP)
   } catch (e: Exception) {
     e.printStackTrace()
     ""

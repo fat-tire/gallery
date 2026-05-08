@@ -33,14 +33,12 @@ import androidx.compose.material.icons.outlined.SentimentVerySatisfied
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.common.LOCAL_URL_BASE
 import com.google.ai.edge.gallery.common.SkillTryOutChip
 import com.google.ai.edge.gallery.common.getJsonResponse
 import com.google.ai.edge.gallery.data.AllowedSkill
 import com.google.ai.edge.gallery.data.DataStoreRepository
 import com.google.ai.edge.gallery.data.SkillAllowlist
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.proto.Skill
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -349,10 +347,6 @@ constructor(
           // 6. Add to ui states and data store.
           addSkill(skill = skill, addToDataStore = true)
           Log.d(TAG, "Successfully added skill from URL: ${skill.name}")
-          firebaseAnalytics?.logEvent(
-            GalleryEvent.SKILL_MANAGEMENT.id,
-            getSkillLoggingParams(skill).apply { putString("action", SkillAction.ADD.value) },
-          )
           onSuccess()
         }
       } finally {
@@ -533,11 +527,6 @@ constructor(
           // Update the skill proto with the new import directory name.
           val skillWithDir = it.toBuilder().setImportDirName(newImportDirName).build()
           addSkill(skill = skillWithDir, addToDataStore = true)
-          Log.d(TAG, "Successfully added skill from local import: ${skillWithDir.name}")
-          firebaseAnalytics?.logEvent(
-            GalleryEvent.SKILL_MANAGEMENT.id,
-            getSkillLoggingParams(skillWithDir).apply { putString("action", SkillAction.ADD.value) },
-          )
           onSuccess()
         }
           ?: run {
@@ -603,15 +592,6 @@ constructor(
     }
 
     val loggingParams = getSkillLoggingParams(skill)
-    Log.d(
-      TAG,
-      "Analytics: skill_management, action=${SkillAction.DELETE.value}, params=$loggingParams",
-    )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      loggingParams.apply { putString("action", SkillAction.DELETE.value) },
-    )
-
     // Update state.
     _uiState.update { currentState ->
       currentState.copy(skills = currentState.skills.filter { it.skill.name != name })
@@ -646,10 +626,6 @@ constructor(
         TAG,
         "Analytics: skill_management, action=${SkillAction.DELETE.value}, params=$loggingParams",
       )
-      firebaseAnalytics?.logEvent(
-        GalleryEvent.SKILL_MANAGEMENT.id,
-        loggingParams.apply { putString("action", SkillAction.DELETE.value) },
-      )
     }
 
     // Update state.
@@ -679,12 +655,6 @@ constructor(
     // Update state.
     val updatedSkill = skill.skill.toBuilder().setSelected(selected).build()
 
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      getSkillLoggingParams(skill.skill).apply {
-        putString("action", if (selected) SkillAction.ENABLE.value else SkillAction.DISABLE.value)
-      },
-    )
     val updatedSkills =
       _uiState.value.skills.map { curSkill ->
         if (curSkill.skill.name == skill.skill.name) {
@@ -711,18 +681,10 @@ constructor(
       currentState.copy(skills = updatedSkills)
     }
 
+
     Log.d(
       TAG,
       "Analytics: skill_management, action=${if (selected) SkillAction.ENABLE_ALL.value else SkillAction.DISABLE_ALL.value}",
-    )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      Bundle().apply {
-        putString(
-          "action",
-          if (selected) SkillAction.ENABLE_ALL.value else SkillAction.DISABLE_ALL.value,
-        )
-      },
     )
 
     // Update data store.

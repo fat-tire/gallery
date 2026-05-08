@@ -79,14 +79,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.data.BuiltInTaskId
 import com.google.ai.edge.gallery.data.ConfigKeys
 import com.google.ai.edge.gallery.data.Model
 import com.google.ai.edge.gallery.data.ModelDownloadStatusType
 import com.google.ai.edge.gallery.data.Task
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.ui.common.ModelPageAppBar
 import com.google.ai.edge.gallery.ui.common.copyBitmapToClipboard
 import com.google.ai.edge.gallery.ui.common.saveBitmapToMediaStore
@@ -98,6 +96,7 @@ import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.collections.filter
 
 private const val TAG = "AGChatView"
 
@@ -233,15 +232,6 @@ fun ChatView(
                     TAG,
                     "Analytics: chat_history, action=load_past_chat, capability_name=${task.id}, model_id=${selectedModel.name}, model_version=${selectedModel.version}",
                   )
-                  firebaseAnalytics?.logEvent(
-                    GalleryEvent.CHAT_HISTORY.id,
-                    Bundle().apply {
-                      putString("action", "load_past_chat")
-                      putString("capability_name", task.id)
-                      putString("model_id", selectedModel.name)
-                      putString("model_version", selectedModel.version)
-                    },
-                  )
 
                   scope.launch {
                     viewModel.setIsResettingSession(true)
@@ -276,15 +266,6 @@ fun ChatView(
                 Log.d(
                   TAG,
                   "Analytics: chat_history, action=click_new_chat, capability_name=${task.id}, model_id=${selectedModel.name}, model_version=${selectedModel.version}",
-                )
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.CHAT_HISTORY.id,
-                  Bundle().apply {
-                    putString("action", "click_new_chat")
-                    putString("capability_name", task.id)
-                    putString("model_id", selectedModel.name)
-                    putString("model_version", selectedModel.version)
-                  },
                 )
 
                 onResetSessionClicked(selectedModel, emptyList(), /* clearHistory= */ true) {}
@@ -344,15 +325,6 @@ fun ChatView(
                 Log.d(
                   TAG,
                   "Analytics: chat_history, action=click_history_tab, capability_name=${task.id}, model_id=${selectedModel.name}, model_version=${selectedModel.version}",
-                )
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.CHAT_HISTORY.id,
-                  Bundle().apply {
-                    putString("action", "click_history_tab")
-                    putString("capability_name", task.id)
-                    putString("model_id", selectedModel.name)
-                    putString("model_version", selectedModel.version)
-                  },
                 )
                 scope.launch { drawerState.open() }
               },

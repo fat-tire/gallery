@@ -22,7 +22,6 @@ import kotlinx.serialization.json.jsonObject
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.common.AgentAction
 import com.google.ai.edge.gallery.common.AskInfoAgentAction
 import com.google.ai.edge.gallery.common.AskMcpToolCallPermissionAction
@@ -35,14 +34,13 @@ import com.google.ai.edge.gallery.common.PermissionResult
 import com.google.ai.edge.gallery.common.RequestPermissionAgentAction
 import com.google.ai.edge.gallery.common.SkillProgressAgentAction
 import com.google.ai.edge.gallery.common.convertStringToJsonObject
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.litertlm.Tool
 import com.google.ai.edge.litertlm.ToolParam
 import com.google.ai.edge.litertlm.ToolSet
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
-import io.modelcontextprotocol.kotlin.sdk.TextContent
+import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequest
+import io.modelcontextprotocol.kotlin.sdk.types.TextContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -159,7 +157,7 @@ open class AgentTools() : ToolSet {
           request = CallToolRequest(
             CallToolRequestParams(
               name = toolName,
-              arguments = kotlinx.serialization.json.Json.parseToJsonElement(input).jsonObject
+              arguments = Json.parseToJsonElement(input).jsonObject
             )
           )
         )
@@ -411,16 +409,6 @@ open class AgentTools() : ToolSet {
     Log.d(
       TAG,
       "Analytics: mcp_execution, capability_name=$taskId, success=$success, error_type=$errorType",
-    )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.MCP_EXECUTION.id,
-      Bundle().apply {
-        putString("capability_name", taskId)
-        putBoolean("success", success)
-        if (errorType.isNotEmpty()) {
-          putString("error_type", errorType)
-        }
-      },
     )
   }
 }

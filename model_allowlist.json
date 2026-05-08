@@ -1,6 +1,48 @@
 {
   "models": [
     {
+      "name": "Gemma-4-E2B-it-abliterated",
+      "modelId": "nqd145/Gemma-4-E2B-it-abliterated-litertlm",
+      "modelFile": "Gemma-4-E2B-it-abliterated.litertlm",
+      "description": "A text-only LiteRT-LM export of Huihui Gemma 4 E2B it abliterated.",
+      "sizeInBytes": 5065244672,
+      "estimatedPeakMemoryInBytes": 5905580032,
+      "version": "20250520",
+      "llmSupportImage": false,
+      "defaultConfig": {
+        "topK": 64,
+        "topP": 0.95,
+        "temperature": 1.0,
+        "maxTokens": 4096,
+        "accelerators": "cpu,gpu"
+      },
+      "taskTypes": ["llm_chat", "llm_prompt_lab"]
+    },
+    {
+      "name": "Gemma-4-12B-it",
+      "modelId": "litert-community/gemma-4-12B-it-litert-lm",
+      "modelFile": "gemma-4-12B-it.litertlm",
+      "description": "A variant of Gemma 4 12B ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/kotlin/getting_started.md). The model supports text and audio modalities up to 32k context length.",
+      "sizeInBytes": 6547589312,
+      "estimatedPeakMemoryInBytes": 6979321856,
+      "version": "20260603",
+      "llmSupportImage": false,
+      "defaultConfig": {
+        "topK": 64,
+        "topP": 0.95,
+        "temperature": 1.0,
+        "maxContextLength": 32000,
+        "maxTokens": 4096,
+        "accelerators": "gpu",
+      },
+      "taskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+        "llm_ask_audio"
+      ],
+    },
+    {
       "name": "Gemma-3n-E2B-it-int4",
       "modelId": "google/gemma-3n-E2B-it-litert-preview",
       "modelFile": "gemma-3n-E2B-it-int4.task",

@@ -1,6 +1,176 @@
 {
   "models": [
     {
+      "name": "PaddleOCR-VL-1.6",
+      "modelId": "litert-community/PaddleOCR-VL-1.6",
+      "modelFile": "PaddleOCR-VL-1.6.litertlm",
+      "description": "A SOTA open document-parsing model. It uses a special prompt, so see https://huggingface.co/litert-community/PaddleOCR-VL-1.6",
+      "sizeInBytes": 1390305472,
+      "minDeviceMemoryInGb": 8,
+      "commitHash": "0baac4fabc0d8b48b49099358d82f75d246e3dbe",
+      "llmSupportImage": true,
+      "llmSupportAudio": false,
+      "capabilities": [],
+      "defaultConfig": {
+        "topK": 64,
+        "topP": 0.95,
+        "temperature": 1.0,
+        "maxContextLength": 32000,
+        "maxTokens": 4000,
+        "accelerators": "gpu,cpu",
+        "visionAccelerator": "gpu"
+      },
+      "taskTypes": [
+        "llm_ask_image",
+      ],
+      "bestForTaskTypes": [
+        "llm_ask_image",
+      ],
+      "capabilityToTaskTypes": {
+        "llm_thinking": [],
+        "speculative_decoding": []
+      },
+      "updatableModelFiles": [
+        {
+          "fileName": "PaddleOCR-VL-1.6.litertlm",
+          "commitHash": "0baac4fabc0d8b48b49099358d82f75d246e3dbe"
+        }
+      ],
+      "updateInfo": ""
+    },
+    {
+      "name": "TPU: Gemma-4-E2B-it",
+      "modelId": "litert-community/gemma-4-E2B-it-litert-lm",
+      "modelFile": "gemma-4-E2B-it_Google_Tensor_G5.litertlm",
+      "description": "TPU (Tensor G5 for Pixel 10+ ONLY) Gemma 4 E2B ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/kotlin/getting_started.md). It supports multi-modality input, with up to 32K context length.",
+      "sizeInBytes": 3113545589,
+      "minDeviceMemoryInGb": 8,
+      "commitHash": "9262660a1676eed6d0c477ab1a86344430854664",
+      "llmSupportImage": true,
+      "llmSupportAudio": true,
+      "capabilities": ["llm_thinking", "speculative_decoding"],
+      "defaultConfig": {
+        "topK": 64,
+        "topP": 0.95,
+        "temperature": 1.0,
+        "maxContextLength": 32000,
+        "maxTokens": 4000,
+        "accelerators": "tpu,gpu,cpu",
+        "visionAccelerator": "gpu"
+      },
+      "taskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+        "llm_ask_image",
+        "llm_ask_audio"
+      ],
+      "bestForTaskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+        "llm_ask_image",
+        "llm_ask_audio"
+      ],
+      "capabilityToTaskTypes": {
+        "llm_thinking": ["llm_chat", "llm_ask_image", "llm_ask_audio"],
+        "speculative_decoding": ["llm_chat", "llm_ask_image", "llm_ask_audio", "llm_prompt_lab"]
+      },
+      "updatableModelFiles": [
+        {
+          "fileName": "gemma-4-E2B-it_Google_Tensor_G5.litertlm",
+          "commitHash": "9262660a1676eed6d0c477ab1a86344430854664"
+        }
+      ],
+      "updateInfo": "The updated model now leverages Gemma 4's built-in Multi Token Prediction (MTP) for faster decode on select workloads. You can enable or disable MTP using a new toggle in chat configuration."
+    },
+    {
+      "name": "Gemma-4-E2B-it-abliterated",
+      "modelId": "nqd145/Gemma-4-E2B-it-abliterated-litertlm",
+      "modelFile": "Gemma-4-E2B-it-abliterated.litertlm",
+      "description": "A text-only LiteRT-LM export of Huihui Gemma 4 E2B it abliterated.",
+      "sizeInBytes": 5065244672,
+      "minDeviceMemoryInGb": 8,
+      "commitHash": "88af5fc419e2337fae8a3e5434587d046c64e534",
+      "llmSupportImage": false,
+      "llmSupportAudio": false,
+      "capabilities": ["llm_thinking", "speculative_decoding"],
+      "defaultConfig": {
+        "topK": 64,
+        "topP": 0.95,
+        "temperature": 1.0,
+        "maxContextLength": 32000,
+        "maxTokens": 4096,
+        "accelerators": "gpu,cpu",
+        "visionAccelerator": "gpu"
+      },
+      "taskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+      ],
+      "bestForTaskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+      ],
+      "capabilityToTaskTypes": {
+        "llm_thinking": ["llm_chat"],
+        "speculative_decoding": ["llm_chat","llm_prompt_lab"]
+      },
+      "updatableModelFiles": [
+        {
+          "fileName": "Gemma-4-E2B-it-abliterated.litertlm",
+          "commitHash": "88af5fc419e2337fae8a3e5434587d046c64e534"
+        }
+      ],
+      "updateInfo":  "A text-only export of Huihui Gemma 4 E2B it abliterated."
+    },
+    {
+      "name": "Gemma-4-12B-it",
+      "modelId": "litert-community/gemma-4-12B-it-litert-lm",
+      "modelFile": "gemma-4-12B-it.litertlm",
+      "description": "A variant of Gemma 4 12B ready for deployment on Android using [LiteRT-LM](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/kotlin/getting_started.md). The model supports text and audio modalities up to 32k context length.",
+      "sizeInBytes": 6547589312,
+      "minDeviceMemoryInGb": 12,
+      "commitHash": "d7de8ec6dcf035c90999ff38560bf4c6eb45a947",
+      "llmSupportImage": false,
+      "llmSupportAudio": true,
+      "capabilities": ["llm_thinking"],
+      "defaultConfig": {
+        "topK": 64,
+        "topP": 0.95,
+        "temperature": 1.0,
+        "maxContextLength": 32000,
+        "maxTokens": 4096,
+        "accelerators": "gpu",
+        "visionAccelerator": "gpu"
+      },
+      "taskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+        "llm_ask_audio"
+      ],
+      "bestForTaskTypes": [
+        "llm_chat",
+        "llm_prompt_lab",
+        "llm_agent_chat",
+        "llm_ask_audio"
+      ],
+      "capabilityToTaskTypes": {
+        "llm_thinking": ["llm_chat", "llm_ask_audio"],
+        "speculative_decoding": ["llm_chat", "llm_ask_audio", "llm_prompt_lab"]
+      },
+      "updatableModelFiles": [
+        {
+          "fileName": "gemma-4-12B-it.litertlm",
+          "commitHash": "d7de8ec6dcf035c90999ff38560bf4c6eb45a947"
+        }
+      ],
+      "updateInfo": ""
+    },
+    {
       "name": "Gemma-4-E2B-it",
       "modelId": "litert-community/gemma-4-E2B-it-litert-lm",
       "modelFile": "gemma-4-E2B-it.litertlm",

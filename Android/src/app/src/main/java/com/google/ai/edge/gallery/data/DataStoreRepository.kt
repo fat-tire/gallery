@@ -49,6 +49,10 @@ interface DataStoreRepository {
 
   fun saveAccessTokenData(accessToken: String, refreshToken: String, expiresAt: Long)
 
+  fun saveRepoName(repoName: String)
+
+  fun getRepoName(): String
+
   fun clearAccessTokenData()
 
   fun readAccessTokenData(): AccessTokenData?
@@ -164,6 +168,19 @@ class DefaultDataStoreRepository(
   override fun deleteSecret(key: String) {
     runBlocking {
       userDataDataStore.updateData { userData -> userData.toBuilder().removeSecrets(key).build() }
+    }
+  }
+
+  override fun saveRepoName(repoName: String) {
+    runBlocking {
+      userDataDataStore.updateData { userData -> userData.toBuilder().setRepoName(repoName).build()}
+    }
+  }
+
+  override fun getRepoName(): String {
+    return runBlocking {
+      val userData = userDataDataStore.data.first()
+      userData.repoName
     }
   }
 

@@ -106,6 +106,7 @@ message UserData {
   repeated ChatSessionProto chat_sessions = 3;
   // MCP server URL to MCP auth data.
   map<string, McpAuth> mcp_auths = 4;
+  string repoName = 5;
 }
 
 enum FillMode {

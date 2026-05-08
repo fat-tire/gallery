@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 plugins {
   alias(libs.plugins.android.application)
-  // Note: set apply to true to enable google-services (requires google-services.json).
-  alias(libs.plugins.google.services) apply false
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hilt.application)
   alias(libs.plugins.oss.licenses)
   alias(libs.plugins.ksp)
-  kotlin("kapt")
 }
 
 android {
@@ -47,27 +46,36 @@ android {
     manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-  }
 
+    var buildDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())
+    buildConfigField("String", "BUILD_DATE_TIME", "\"$buildDate\"")
+  }
   buildTypes {
     release {
-      isMinifyEnabled = false
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("debug")
     }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-  }
-  kotlinOptions {
-    jvmTarget = "11"
-    freeCompilerArgs += "-Xcontext-receivers"
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
   buildFeatures {
     compose = true
     buildConfig = true
   }
+
+  tasks.named("preBuild") {
+    dependsOn(syncFeaturedSkills)
+  }
+}
+
+val syncFeaturedSkills = tasks.register<Copy>("syncFeaturedSkills") {
+  description = "Move external skills into build"
+    from("../../../skills/featured")
+  into("src/main/assets/skills")
 }
 
 dependencies {
@@ -92,30 +100,25 @@ dependencies {
   implementation(libs.litertlm)
   implementation(libs.commonmark)
   implementation(libs.richtext)
-  implementation(libs.tflite)
-  implementation(libs.tflite.gpu)
-  implementation(libs.tflite.support)
   implementation(libs.camerax.core)
   implementation(libs.camerax.camera2)
   implementation(libs.camerax.lifecycle)
   implementation(libs.camerax.view)
+  //noinspection LoginCredentials
   implementation(libs.openid.appauth)
   implementation(libs.androidx.splashscreen)
   implementation(libs.protobuf.javalite)
+  implementation(libs.protobuf.kotlinlite)
+  implementation(libs.androidx.documentfile)
   implementation(libs.hilt.android)
   implementation(libs.hilt.navigation.compose)
   implementation(libs.play.services.oss.licenses)
-  implementation(platform(libs.firebase.bom))
-  implementation(libs.firebase.analytics)
-  implementation(libs.firebase.messaging)
   implementation(libs.androidx.exifinterface)
   implementation(libs.moshi.kotlin)
-  kapt(libs.hilt.android.compiler)
+  ksp(libs.hilt.android.compiler)
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
-  androidTestImplementation(platform(libs.androidx.compose.bom))
-  androidTestImplementation(libs.androidx.ui.test.junit4)
   androidTestImplementation(libs.hilt.android.testing)
   debugImplementation(libs.androidx.ui.tooling)
   debugImplementation(libs.androidx.ui.test.manifest)
@@ -127,6 +130,20 @@ dependencies {
 }
 
 protobuf {
-  protoc { artifact = "com.google.protobuf:protoc:4.26.1" }
-  generateProtoTasks { all().forEach { it.plugins { create("java") { option("lite") } } } }
+  protoc { artifact = "com.google.protobuf:protoc:${libs.protobuf.javalite.get().version}" }
+  generateProtoTasks { all().forEach { task -> task.builtins { create("java") { option("lite") } } } }
+
+  gradle.taskGraph.whenReady {
+    allTasks.forEach { task ->
+      if (task.name.contains("ossLicensesTask", ignoreCase = true)) {
+        task.enabled = false
+      }
+    }
+  }
+}
+
+configurations.all {
+  resolutionStrategy {
+    force(libs.kotlin.metadata.jvm)
+  }
 }

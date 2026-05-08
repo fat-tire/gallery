@@ -74,7 +74,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.common.AskInfoAgentAction
 import com.google.ai.edge.gallery.common.AskMcpToolCallPermissionAction
@@ -87,7 +86,6 @@ import com.google.ai.edge.gallery.data.AgentSkillsURLs
 import com.google.ai.edge.gallery.data.BuiltInTaskId
 import com.google.ai.edge.gallery.data.Model
 import com.google.ai.edge.gallery.data.Task
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.ui.common.BaseGalleryWebViewClient
 import com.google.ai.edge.gallery.ui.common.GalleryWebView
 import com.google.ai.edge.gallery.ui.common.buildTrackableUrlAnnotatedString
@@ -114,6 +112,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
+import kotlin.collections.map
 
 private const val TAG = "AGAgentChatScreen"
 private val chatViewJavascriptInterface = ChatWebViewJavascriptInterface()
@@ -333,16 +332,6 @@ fun AgentChatScreen(
                       TAG,
                       "Analytics: skill_execution, capability_name=${task.id}, skill_name=$skillName, success=false, error_type=timeout",
                     )
-                    firebaseAnalytics?.logEvent(
-                      GalleryEvent.SKILL_EXECUTION.id,
-                      Bundle().apply {
-                        putString("capability_name", task.id)
-                        putString("skill_name", skillName)
-                        putString("skill_id", skillId)
-                        putBoolean("success", false)
-                        putString("error_type", "timeout")
-                      },
-                    )
                     action.result.complete(
                       "{\"error\": \"Skill execution timed out. Please check network connection.\"}"
                     )
@@ -369,16 +358,6 @@ fun AgentChatScreen(
                   Log.d(
                     TAG,
                     "Analytics: skill_execution, capability_name=${task.id}, skill_name=$skillName, success=$isSuccess, error_type=$errorType",
-                  )
-                  firebaseAnalytics?.logEvent(
-                    GalleryEvent.SKILL_EXECUTION.id,
-                    Bundle().apply {
-                      putString("capability_name", task.id)
-                      putString("skill_name", skillName)
-                      putString("skill_id", skillId)
-                      putBoolean("success", isSuccess)
-                      putString("error_type", errorType)
-                    },
                   )
                 }
 
@@ -409,16 +388,6 @@ fun AgentChatScreen(
                 Log.d(
                   TAG,
                   "Analytics: skill_execution, capability_name=${task.id}, skill_name=$skillName, success=false, error_type=exception",
-                )
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.SKILL_EXECUTION.id,
-                  Bundle().apply {
-                    putString("capability_name", task.id)
-                    putString("skill_name", skillName)
-                    putString("skill_id", skillId)
-                    putBoolean("success", false)
-                    putString("error_type", "exception")
-                  },
                 )
                 action.result.completeExceptionally(e)
               }
@@ -573,13 +542,6 @@ fun AgentChatScreen(
                       messages =
                         listOf(ChatMessageText(content = promptChip.prompt, side = ChatSide.USER)),
                     )
-                  firebaseAnalytics?.logEvent(
-                    GalleryEvent.BUTTON_CLICKED.id,
-                    Bundle().apply {
-                      putString("event_type", "agent_skills_prompt_chip")
-                      putString("button_id", promptChip.label)
-                    },
-                  )
                 }
                 // Skill is not selected, show alert dialog.
                 else {

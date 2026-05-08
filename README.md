@@ -1,4 +1,56 @@
-# Google AI Edge Gallery ✨
+# Google AI Edge Gallery++ 🔒
+
+**This unofficial privacy-focused version of Gallery source code removes Firebase analytics and GMS Play services dependencies (but read the warning below!). It includes other changes different from the official release.**
+
+> [!WARNING]
+> Unfortunately, some app dependencies, such as Google's closed-source [ML Kit](https://developers.google.com/ml-kit) library, may *themselves* pull in unwanted code and send telemetry-- use `./gradlew app:dependencies` from the `Android/src/` directory to audit this for yourself. Even worse, ML Kit expressly declares in its [Privacy statement](https://developers.google.com/ml-kit/terms) that "*When you use ML Kit APIs, processing of the input data (e.g. images, video, text) fully happens on-device, and ML Kit does not send that data and the resultant outputs to Google servers.
+> The ML Kit APIs may contact Google servers from time to time in order to receive things like bug fixes, updated models and hardware accelerator compatibility information. The ML Kit APIs also send metrics about the performance and utilization of the APIs in your app to Google.*"
+> 
+> To address potentially unwanted data leaks, the [AndroidManifest.xml](Android/src/app/src/main/AndroidManifest.xml#L65-L135) file includes aggressive instructions intended to disable specific analytics and data transport services. These countermeasures may or may not be successful.
+
+Other changes to this code include:
+
+#### Privacy & Analytics
+* Strip out Firebase Analytics, Play Services Measurement, and Firebase Cloud Messaging from app code (dependencies remain, see Warning above)
+* Strip out Android Tools developer analytics
+* Request mlkit not to send analytics and add some manifest/proguard build filters  remove AD_ID permissions, disable auto app-backups, etc. in `AndroidManifest.xml` to help with privacy (additional ideas for this are invited!)
+
+#### Dependencies & Libraries
+* Switch from GMS play-services-tflite to standalone TFLite
+* Add missing libraries (e.g., documentfile)
+* Update most libraries to their latest versions
+* Fix build issues with new protobuf 0.9.6 and newest AGP
+* Migrate from kapt to ksp
+
+#### Build Configuration
+* Upgrade to Gradle 9.5.1
+* Target SDK 37 (Android 17)
+* Turn off cloud app backup
+* Enable minification and shrinkResources for release builds
+* Add ProGuard rules to allow installRelease build to complete
+* Auto-copy extra featured skills into the APK
+
+#### Language & Runtime
+* Update Kotlin to 2.4.0
+* Update Java from 11 to 21
+
+#### UI / UX
+* Remove onboarding Play ToC agreement (Play-related class was removed, but the agreement is still available for review in the menu)
+* Update to Material 3 DayNight theme
+* Add build timestamp to Settings screen
+
+#### Features & Functionality
+> [!NOTE]
+> The model list is pulled from Google's GitHub by default. To see extra models, change the default repo in the settings to another user, such as "fat-tire".
+* Selectable GitHub-based model lists (if you want to extend beyond the official list)
+* Added the 12B Gemma-4 model (for systems with 12GB+ memory)
+* Added abliterated model option to menu. See related licenses and terms of use before using, and you agree to them use entirely at your own risk.
+* Larger context windows (may break functionality if you exceed context though)
+* Increased constants for images, audio, and more
+* Speculative Decoding (MTP) enabled by default on supported models
+
+> [!NOTE]
+> As code is committed upstream, changes may be rebased over the newer code, so updates to this branch may require `--force`.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/google-ai-edge/gallery)](https://github.com/google-ai-edge/gallery/releases)

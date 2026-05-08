@@ -332,7 +332,7 @@ fun createLlmChatConfigs(
   }
   if (supportSpeculativeDecoding) {
     configs.add(
-      BooleanSwitchConfig(key = ConfigKeys.ENABLE_SPECULATIVE_DECODING, defaultValue = false)
+      BooleanSwitchConfig(key = ConfigKeys.ENABLE_SPECULATIVE_DECODING, defaultValue = true)
     )
   }
   return configs

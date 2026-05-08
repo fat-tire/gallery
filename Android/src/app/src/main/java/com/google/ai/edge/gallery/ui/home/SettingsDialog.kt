@@ -64,7 +64,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -76,6 +78,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.google.ai.edge.gallery.BuildConfig
 import com.google.ai.edge.gallery.R
+import com.google.ai.edge.gallery.data.DEFAULT_REPO_NAME
 import com.google.ai.edge.gallery.proto.Theme
 import com.google.ai.edge.gallery.ui.common.ClickableLink
 import com.google.ai.edge.gallery.ui.common.tos.AppTosDialog
@@ -101,12 +104,15 @@ fun SettingsDialog(
   var selectedTheme by remember { mutableStateOf(curThemeOverride) }
   var selectedFirebaseAnalytics by remember { mutableStateOf(curFirebaseAnalytics) }
   var hfToken by remember { mutableStateOf(modelManagerViewModel.getTokenStatusAndData().data) }
+  var repoName by remember { mutableStateOf(modelManagerViewModel.getRepoName()) }
+
   val dateFormatter = remember {
     DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
       .withZone(ZoneId.systemDefault())
       .withLocale(Locale.getDefault())
   }
   var customHfToken by remember { mutableStateOf("") }
+  var customRepoName by remember { mutableStateOf(modelManagerViewModel.getRepoName())}
   var isFocused by remember { mutableStateOf(false) }
   val focusRequester = remember { FocusRequester() }
   val interactionSource = remember { MutableInteractionSource() }
@@ -137,7 +143,7 @@ fun SettingsDialog(
           )
           // Subtitle.
           Text(
-            "App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+            "App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) - ${BuildConfig.BUILD_DATE_TIME}",
             style = labelSmallNarrow,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.offset(y = (-6).dp),
@@ -204,19 +210,21 @@ fun SettingsDialog(
                 Text(
                   stringResource(R.string.settings_dialog_firebase_analytics_title),
                   style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
-                )
+                  color = lerp(Color.White, Color.Red, 0.6f),
+                  )
                 Text(
                   stringResource(R.string.settings_dialog_firebase_analytics_description),
                   style = MaterialTheme.typography.bodySmall,
-                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  color = lerp(Color.White, Color.Red, 0.6f),
                 )
               }
               Switch(
-                checked = selectedFirebaseAnalytics,
+                checked = false, // selectedFirebaseAnalytics,
                 onCheckedChange = { checked ->
                   selectedFirebaseAnalytics = checked
                   modelManagerViewModel.saveFirebaseAnalytics(checked)
                 },
+                enabled = false,
               )
             }
 
@@ -316,6 +324,95 @@ fun SettingsDialog(
                           Icons.Rounded.CheckCircle,
                           contentDescription = stringResource(R.string.cd_done_icon),
                         )
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          // Use whatever model repo you want
+          Column(
+            modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {},
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+          ) {
+            Text(
+              "Model repository",
+              style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Medium),
+              color = lerp(Color.White, Color.Red, 0.6f),
+              )
+            // Show the start of the token.
+            val curRepoName = repoName
+            Text(
+              "The default is Google's model list.  Select an alternative github user." +
+                      " Then restart the app to reload list",
+              style = MaterialTheme.typography.bodyMedium,
+              //color = MaterialTheme.colorScheme.onSurfaceVariant,
+              color = lerp(Color.White, Color.Red, 0.6f),
+              )
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+              OutlinedButton(
+                onClick = {
+                  repoName = DEFAULT_REPO_NAME
+                  customRepoName = DEFAULT_REPO_NAME
+                  modelManagerViewModel.saveRepoName(DEFAULT_REPO_NAME)
+                },
+                enabled = curRepoName != null,
+              ) {
+                Text("Default",     color = lerp(Color.White, Color.Red, 0.6f),
+                )
+              }
+              val handleSaveRepoName = {
+                modelManagerViewModel.saveRepoName( repoName = customRepoName )
+                repoName = modelManagerViewModel.getRepoName()
+                focusManager.clearFocus()
+              }
+              BasicTextField(
+                value = customRepoName,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { handleSaveRepoName() }),
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .padding(top = 4.dp)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { isFocused = it.isFocused },
+                onValueChange = { customRepoName = it },
+                textStyle = TextStyle(color = lerp(Color.White, Color.Red, 0.6f),
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+              ) { innerTextField ->
+                Box(
+                  modifier =
+                    Modifier.border(
+                      width = if (isFocused) 2.dp else 1.dp,
+                      color =
+                        if (isFocused) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.outline,
+                      shape = CircleShape,
+                    )
+                      .height(40.dp),
+                  contentAlignment = Alignment.CenterStart,
+                ) {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.padding(start = 16.dp).weight(1f)) {
+                      if (customRepoName.isEmpty()) {
+                        Text(
+                          "Enter repo name manually",
+                          color = MaterialTheme.colorScheme.onSurfaceVariant,
+                          style = MaterialTheme.typography.bodySmall,
+                        )
+                      }
+                      innerTextField()
+                    }
+                    if (customRepoName.isNotEmpty()) {
+                      IconButton(modifier = Modifier.offset(x = 1.dp), onClick = handleSaveRepoName) {
+                        Icon(
+                          Icons.Rounded.CheckCircle,
+                          contentDescription = stringResource(R.string.cd_done_icon),
+                          tint = lerp(Color.White, Color.Red, 0.6f),
+                          )
                       }
                     }
                   }

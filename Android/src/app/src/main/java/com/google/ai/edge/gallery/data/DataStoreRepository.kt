@@ -58,9 +58,13 @@ interface DataStoreRepository {
    *
    * @return `true` if analytics is enabled or has not been explicitly disabled by the user; `false`
    *   otherwise.
+   *
+   *  Actually, hardcode to false no matter what.
+   *
    */
-  fun readFirebaseAnalytics(): Boolean
-
+  fun readFirebaseAnalytics(): Boolean {
+    return false
+  }
   fun saveSecret(key: String, value: String)
 
   fun readSecret(key: String): String?
@@ -68,6 +72,10 @@ interface DataStoreRepository {
   fun deleteSecret(key: String)
 
   fun saveAccessTokenData(accessToken: String, refreshToken: String, expiresAt: Long)
+
+  fun saveRepoName(repoName: String)
+
+  fun getRepoName(): String
 
   fun clearAccessTokenData()
 
@@ -207,6 +215,19 @@ class DefaultDataStoreRepository(
   override fun deleteSecret(key: String) {
     runBlocking {
       userDataDataStore.updateData { userData -> userData.toBuilder().removeSecrets(key).build() }
+    }
+  }
+
+  override fun saveRepoName(repoName: String) {
+    runBlocking {
+      userDataDataStore.updateData { userData -> userData.toBuilder().setRepoName(repoName).build()}
+    }
+  }
+
+  override fun getRepoName(): String {
+    return runBlocking {
+      val userData = userDataDataStore.data.first()
+      userData.repoName
     }
   }
 

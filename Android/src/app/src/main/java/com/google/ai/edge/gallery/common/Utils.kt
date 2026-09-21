@@ -38,9 +38,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.data.SAMPLE_RATE
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.gson.Gson
 import java.io.File
 import java.io.FileInputStream
@@ -431,37 +429,6 @@ fun isAICoreSupported(allowedDeviceModels: Set<String>?): Boolean {
     )
   }
   return supported
-}
-
-fun logErrorToFirebase(event: GalleryEvent, errorType: String, errorMessage: String?) {
-  firebaseAnalytics?.logEvent(
-    event.id,
-    Bundle().apply {
-      putBoolean("success", false)
-      putString("error_type", errorType)
-      putString("error_message", errorMessage ?: "Unknown error")
-    },
-  )
-}
-
-/**
- * Reports a button press to Firebase as a [GalleryEvent.BUTTON_CLICKED] event.
- *
- * [eventType] identifies the button and must be unique per button, so that two different buttons
- * are never distinguished by their parameters alone. Pass [buttonId] only for a single button that
- * carries a value, such as one segment of a segmented button. Use [extras] to report any further
- * parameters describing the press; it cannot overwrite the two keys above, which are always written
- * last.
- */
-fun logButtonClick(eventType: String, buttonId: String? = null, extras: Bundle.() -> Unit = {}) {
-  firebaseAnalytics?.logEvent(
-    GalleryEvent.BUTTON_CLICKED.id,
-    Bundle().apply {
-      extras()
-      putString("event_type", eventType)
-      buttonId?.let { putString("button_id", it) }
-    },
-  )
 }
 
 fun convertStringToJsonObject(jsonString: String): JsonObject {

@@ -21,8 +21,6 @@ package com.google.ai.edge.gallery.ui.modelmanager
 // import com.google.ai.edge.gallery.ui.preview.TASK_TEST1
 // import com.google.ai.edge.gallery.ui.theme.GalleryTheme
 
-import androidx.compose.ui.platform.LocalContext
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -73,6 +71,7 @@ import com.google.ai.edge.gallery.ui.common.modelitem.ModelItem
 import com.google.ai.edge.gallery.ui.common.rememberDelayedAnimationProgress
 import com.google.ai.edge.gallery.ui.theme.bodyLargeNarrow
 import com.google.ai.edge.gallery.ui.theme.headlineLargeMedium
+import androidx.compose.ui.platform.LocalResources
 
 private const val TAG = "AGModelList"
 private val CONTENT_ANIMATION_OFFSET = 16.dp
@@ -289,7 +288,7 @@ fun ModelList(
           }
 
           // Models available.
-          val resources = LocalContext.current.resources
+          val resources = LocalResources.current
           Text(
             resources.getQuantityString(
               R.plurals.model_list_number_of_models_available,

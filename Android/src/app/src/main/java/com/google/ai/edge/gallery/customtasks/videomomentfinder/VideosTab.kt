@@ -47,10 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
-import com.google.ai.edge.gallery.common.logErrorToFirebase
+
 import com.google.ai.edge.gallery.ui.common.EmptyState
 import com.google.ai.edge.gallery.ui.common.EmptyStateButtonConfig
 import com.google.ai.edge.gallery.ui.common.SMALL_BUTTON_CONTENT_PADDING
@@ -96,7 +94,6 @@ fun VideosTab(viewModel: VideoMomentFinderViewModel) {
                   duration = SnackbarDuration.Short,
                 )
               if (result == SnackbarResult.ActionPerformed) {
-                logButtonClick("videomomentfinder_open_already_imported_video")
                 // Re-resolved because the project may have been deleted or updated while the
                 // snackbar was showing.
                 viewModel.uiState.value.projects
@@ -117,11 +114,7 @@ fun VideosTab(viewModel: VideoMomentFinderViewModel) {
               withContext(Dispatchers.IO) { checkVideoDecoderSupport(context, uri) }
             if (decoderSupport is VideoDecoderSupport.Unsupported) {
               val format = decoderSupport.format
-              logErrorToFirebase(
-                GalleryEvent.BUTTON_CLICKED,
-                "videomomentfinder_add_video_unsupported_decoder",
-                "${format.mimeType} ${format.width}x${format.height}",
-              )
+
               showUnsupportedVideoDialog = true
               return@launch
             }
@@ -142,7 +135,6 @@ fun VideosTab(viewModel: VideoMomentFinderViewModel) {
             buttonLabelResId = R.string.videomomentfinder_add_video_button,
             buttonIcon = Icons.Outlined.FileUpload,
             onButtonClick = {
-              logButtonClick("videomomentfinder_add_video_empty_state")
               photoPickerLauncher.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
               )
@@ -201,7 +193,6 @@ fun VideosTab(viewModel: VideoMomentFinderViewModel) {
       confirmButton = {
         Button(
           onClick = {
-            logButtonClick("videomomentfinder_video_duration_limit_ok")
             showDurationLimitDialog = false
           },
           contentPadding = SMALL_BUTTON_CONTENT_PADDING,
@@ -221,7 +212,6 @@ fun VideosTab(viewModel: VideoMomentFinderViewModel) {
       confirmButton = {
         Button(
           onClick = {
-            logButtonClick("videomomentfinder_video_unsupported_ok")
             showUnsupportedVideoDialog = false
           },
           contentPadding = SMALL_BUTTON_CONTENT_PADDING,

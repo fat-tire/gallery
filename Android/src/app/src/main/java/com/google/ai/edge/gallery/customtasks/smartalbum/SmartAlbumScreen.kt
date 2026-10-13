@@ -120,7 +120,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.services.photolibrary.PhotoAsset
 import com.google.ai.edge.gallery.services.photolibrary.PhotoLibraryService
 import com.google.ai.edge.gallery.ui.theme.customColors
@@ -769,7 +768,6 @@ private fun SmartAlbumMainContent(
         onClick =
           if (isSampleAvailable) {
             {
-              logButtonClick("smartalbum_open_sample_photos")
               viewModel.selectSource(SmartAlbumSource.SAMPLE_ALBUM)
               searchViewModel.selectSource(SmartAlbumSource.SAMPLE_ALBUM)
               onOpenSearch()
@@ -825,10 +823,8 @@ private fun SmartAlbumMainContent(
         placeholderIcon = Icons.Outlined.AddPhotoAlternate,
         onClick = {
           if (!hasPermission || (progress.totalCount == 0 && recentAssets.isEmpty())) {
-            logButtonClick("smartalbum_request_photo_permission")
             onRequestPermission()
           } else {
-            logButtonClick("smartalbum_open_user_photos")
             viewModel.selectSource(SmartAlbumSource.USER_PHOTOS)
             searchViewModel.selectSource(SmartAlbumSource.USER_PHOTOS)
             onOpenSearch()

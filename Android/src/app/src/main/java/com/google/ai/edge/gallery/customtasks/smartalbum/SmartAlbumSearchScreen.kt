@@ -181,7 +181,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.common.ImageUtils
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.services.photolibrary.PhotoAsset
 import com.google.ai.edge.gallery.services.photolibrary.PhotoLibraryService
 import com.google.ai.edge.gallery.services.semanticretrieval.SemanticRetrievalResult
@@ -381,12 +380,11 @@ fun SmartAlbumSearchScreen(
     RemovePhotosConfirmationDialog(
       selectedCount = selectedPhotoIds.size,
       onConfirm = {
-        logButtonClick("smartalbum_remove_selected_confirm")
         showRemoveConfirmDialog = false
         searchViewModel.removeSelectedPhotos()
       },
       onDismiss = { showRemoveConfirmDialog = false },
-      onCancelButtonClick = { logButtonClick("smartalbum_remove_selected_cancel") },
+      onCancelButtonClick = {  },
     )
   }
 
@@ -517,7 +515,7 @@ fun SmartAlbumSearchScreen(
                         color = MaterialTheme.colorScheme.secondaryContainer,
                         modifier =
                           Modifier.clickable {
-                            logButtonClick("smartalbum_open_manage_menu")
+    
                             coroutineScope.launch {
                               searchViewModel.refreshAddAllPhotosCount()
                               showManageMenu = true
@@ -551,7 +549,6 @@ fun SmartAlbumSearchScreen(
                         DropdownMenuItem(
                           text = { Text(stringResource(R.string.smartalbum_add_more_photos)) },
                           onClick = {
-                            logButtonClick("smartalbum_manage_add_photos")
                             showManageMenu = false
                             multiplePhotoPickerLauncher.launch(
                               PickVisualMediaRequest(ImageAndVideo)
@@ -570,7 +567,6 @@ fun SmartAlbumSearchScreen(
                               )
                             },
                             onClick = {
-                              logButtonClick("smartalbum_manage_add_all_photos")
                               showManageMenu = false
                               searchViewModel.addAllPermittedPhotos()
                             },
@@ -581,7 +577,6 @@ fun SmartAlbumSearchScreen(
                             Text(stringResource(R.string.smartalbum_select_photos_to_remove))
                           },
                           onClick = {
-                            logButtonClick("smartalbum_manage_select_to_remove")
                             showManageMenu = false
                             searchViewModel.enterSelectionMode()
                           },
@@ -589,7 +584,6 @@ fun SmartAlbumSearchScreen(
                         DropdownMenuItem(
                           text = { Text(stringResource(R.string.smartalbum_remove_all_photos)) },
                           onClick = {
-                            logButtonClick("smartalbum_manage_remove_all")
                             showManageMenu = false
                             searchViewModel.removeAllPhotos()
                           },
@@ -599,7 +593,6 @@ fun SmartAlbumSearchScreen(
                   } else {
                     SmallFilledTonalButton(
                       onClick = {
-                        logButtonClick("smartalbum_add_photos_subheader")
                         if (onRequestPermission != null) {
                           onRequestPermission()
                         } else {
@@ -664,7 +657,6 @@ fun SmartAlbumSearchScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     SmallFilledTonalButton(
                       onClick = {
-                        logButtonClick("smartalbum_add_photos_empty_state")
                         if (onRequestPermission != null) {
                           onRequestPermission()
                         } else {
@@ -697,16 +689,15 @@ fun SmartAlbumSearchScreen(
                     photoLibraryService = searchViewModel.photoLibraryService,
                     onClick = {
                       if (isSelectionMode) {
-                        logButtonClick("smartalbum_toggle_select_photo")
+
                         searchViewModel.togglePhotoSelection(asset.id)
                       } else {
-                        logButtonClick("smartalbum_open_photo_detail")
+
                         clearFocusAndHideKeyboard()
                         selectedMatch = MatchedAssetResult(asset = asset, similarity = null)
                       }
                     },
                     onLongClick = {
-                      logButtonClick("smartalbum_long_press_select_photo")
                       searchViewModel.togglePhotoSelection(asset.id)
                     },
                   )
@@ -818,7 +809,6 @@ fun SmartAlbumSearchScreen(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier =
                           Modifier.size(18.dp).clickable {
-                            logButtonClick("smartalbum_dismiss_indexing_warning")
                             isWarningBannerDismissed = true
                           },
                       )
@@ -860,16 +850,13 @@ fun SmartAlbumSearchScreen(
                       photoLibraryService = searchViewModel.photoLibraryService,
                       onClick = {
                         if (isSelectionMode) {
-                          logButtonClick("smartalbum_toggle_select_search_result")
                           searchViewModel.togglePhotoSelection(match.asset.id)
                         } else {
-                          logButtonClick("smartalbum_select_search_result")
                           clearFocusAndHideKeyboard()
                           selectedMatch = match
                         }
                       },
                       onLongClick = {
-                        logButtonClick("smartalbum_long_press_select_search_result")
                         searchViewModel.togglePhotoSelection(match.asset.id)
                       },
                       isBelowThreshold = isBelowThreshold,
@@ -943,21 +930,21 @@ fun SmartAlbumSearchScreen(
             selectedCount = selectedPhotoIds.size,
             isAllSelected = isAllSelected,
             onSelectAll = {
-              logButtonClick("smartalbum_select_all")
+              
               searchViewModel.selectAll()
             },
             onDeselectAll = {
-              logButtonClick("smartalbum_deselect_all")
+              
               searchViewModel.deselectAll()
             },
             onRemove = {
-              logButtonClick("smartalbum_remove_selected_start")
+              
               if (selectedPhotoIds.isNotEmpty()) {
                 showRemoveConfirmDialog = true
               }
             },
             onClose = {
-              logButtonClick("smartalbum_close_selection_mode")
+              
               searchViewModel.exitSelectionMode()
             },
           )
@@ -1000,7 +987,7 @@ fun SmartAlbumSearchScreen(
                 Surface(
                   modifier =
                     Modifier.clickable {
-                      logButtonClick("smartalbum_select_suggestion_chip")
+                      
                       searchViewModel.onSearchTextChanged(term, immediate = true)
                       clearFocusAndHideKeyboard()
                     },
@@ -1086,7 +1073,7 @@ fun SmartAlbumSearchScreen(
                       tint = MaterialTheme.colorScheme.onPrimaryContainer,
                       modifier =
                         Modifier.size(16.dp).clickable {
-                          logButtonClick("smartalbum_remove_image_attachment")
+  
                           searchViewModel.clearSelectedImage()
                           clearFocusAndHideKeyboard()
                         },
@@ -1098,7 +1085,6 @@ fun SmartAlbumSearchScreen(
                 Box {
                   IconButton(
                     onClick = {
-                      logButtonClick("smartalbum_open_search_add_menu")
                       showAddMenu = true
                     }
                   ) {
@@ -1120,7 +1106,6 @@ fun SmartAlbumSearchScreen(
                         )
                       },
                       onClick = {
-                        logButtonClick("smartalbum_search_with_camera")
                         showAddMenu = false
                         clearFocusAndHideKeyboard()
                         searchViewModel.openLiveCameraSearch()
@@ -1136,7 +1121,7 @@ fun SmartAlbumSearchScreen(
                         )
                       },
                       onClick = {
-                        logButtonClick("smartalbum_search_with_image")
+
                         showAddMenu = false
                         clearFocusAndHideKeyboard()
                         photoPickerLauncher.launch("image/*")
@@ -1175,7 +1160,7 @@ fun SmartAlbumSearchScreen(
               if (searchText.isNotEmpty() || selectedImageAsset != null) {
                 IconButton(
                   onClick = {
-                    logButtonClick("smartalbum_clear_search_query")
+                    
                     searchViewModel.clearSearch()
                     searchViewModel.clearSelectedImage()
                     clearFocusAndHideKeyboard()
@@ -1190,7 +1175,7 @@ fun SmartAlbumSearchScreen(
               } else {
                 IconButton(
                   onClick = {
-                    logButtonClick("smartalbum_focus_search_input")
+                    
                     focusRequester.requestFocus()
                     keyboardController?.show()
                   }
@@ -1635,7 +1620,7 @@ private fun PhotoDetailDialog(
             ) {
               IconButton(
                 onClick = {
-                  logButtonClick("smartalbum_photo_detail_back")
+                  
                   onDismiss()
                 }
               ) {
@@ -1665,7 +1650,7 @@ private fun PhotoDetailDialog(
 
               IconButton(
                 onClick = {
-                  logButtonClick("smartalbum_photo_detail_close")
+                  
                   onDismiss()
                 }
               ) {
@@ -1721,7 +1706,7 @@ private fun PhotoDetailDialog(
                 // Bottom Action Button: Find similar images
                 Surface(
                   onClick = {
-                    logButtonClick("smartalbum_find_similar_images")
+                    
                     onSearchSimilar(matchForPage.asset)
                   },
                   shape = CircleShape,
@@ -1767,7 +1752,7 @@ private fun PhotoDetailDialog(
                     isSelected = isSelected,
                     photoLibraryService = photoLibraryService,
                     onClick = {
-                      logButtonClick("smartalbum_select_carousel_thumbnail")
+                      
                       coroutineScope.launch { pagerState.animateScrollToPage(index) }
                     },
                   )
@@ -1781,7 +1766,7 @@ private fun PhotoDetailDialog(
               color = MaterialTheme.colorScheme.surfaceContainerHigh,
               modifier =
                 Modifier.fillMaxWidth().clickable {
-                  logButtonClick("smartalbum_open_embedding_info")
+                  
                   showInfoScreen = true
                 },
             ) {
@@ -2014,7 +1999,7 @@ internal fun FullscreenVideoPlayer(
           detectTapGestures(
             onDoubleTap = { tapOffset ->
               val isLeft = tapOffset.x < size.width / 2f
-              logButtonClick(if (isLeft) "smartalbum_video_rewind" else "smartalbum_video_forward")
+              
               videoViewRef?.let { vv ->
                 val currentPos = vv.currentPosition
                 val duration = vv.duration
@@ -2034,11 +2019,11 @@ internal fun FullscreenVideoPlayer(
             onTap = {
               videoViewRef?.let { vv ->
                 if (vv.isPlaying) {
-                  logButtonClick("smartalbum_video_pause")
+                  
                   vv.pause()
                   isPlaying = false
                 } else {
-                  logButtonClick("smartalbum_video_play")
+                  
                   vv.start()
                   isPlaying = true
                 }
@@ -2260,7 +2245,7 @@ private fun EmbeddingInfoScreen(
     ) {
       IconButton(
         onClick = {
-          logButtonClick("smartalbum_embedding_info_back")
+          
           onBack()
         }
       ) {
@@ -2295,7 +2280,7 @@ private fun EmbeddingInfoScreen(
           .height(180.dp)
           .background(MaterialTheme.colorScheme.scrim)
           .clickable {
-            logButtonClick("smartalbum_embedding_info_preview_close")
+            
             onBack()
           },
       contentAlignment = Alignment.Center,
@@ -2325,7 +2310,7 @@ private fun EmbeddingInfoScreen(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
             Modifier.fillMaxWidth().clickable {
-              logButtonClick("smartalbum_embedding_info_close")
+              
               onBack()
             },
         ) {
@@ -2362,10 +2347,6 @@ private fun EmbeddingInfoScreen(
               verticalAlignment = Alignment.CenterVertically,
               modifier =
                 Modifier.fillMaxWidth().clickable {
-                  logButtonClick(
-                    if (isInputDataExpanded) "smartalbum_collapse_input_data"
-                    else "smartalbum_expand_input_data"
-                  )
                   isInputDataExpanded = !isInputDataExpanded
                 },
             ) {
@@ -2403,7 +2384,7 @@ private fun EmbeddingInfoScreen(
                 onClick =
                   if (hasLocation) {
                     {
-                      logButtonClick("smartalbum_search_by_location")
+                      
                       onSearchLocation(locationText)
                     }
                   } else null,
@@ -2444,10 +2425,6 @@ private fun EmbeddingInfoScreen(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier =
                   Modifier.clickable {
-                    logButtonClick(
-                      if (isOutputDataExpanded) "smartalbum_collapse_output_data"
-                      else "smartalbum_expand_output_data"
-                    )
                     isOutputDataExpanded = !isOutputDataExpanded
                   },
               )
@@ -2466,7 +2443,7 @@ private fun EmbeddingInfoScreen(
                   color = MaterialTheme.colorScheme.primaryContainer,
                   modifier =
                     Modifier.clickable(enabled = !isGeneratingEmbedding) {
-                      logButtonClick("smartalbum_generate_embedding")
+                      
                       isGeneratingEmbedding = true
                       coroutineScope.launch {
                         try {
@@ -2838,7 +2815,7 @@ private fun SmartAlbumSourcePicker(
       color = MaterialTheme.colorScheme.surfaceVariant,
       modifier =
         Modifier.clickable {
-          logButtonClick("smartalbum_open_source_picker")
+          
           expanded = true
         },
     ) {
@@ -2878,10 +2855,6 @@ private fun SmartAlbumSourcePicker(
           )
         },
         onClick = {
-          logButtonClick(
-            "smartalbum_select_source",
-            buttonId = SmartAlbumSource.SAMPLE_ALBUM.name.lowercase(),
-          )
           expanded = false
           onSourceSelected(SmartAlbumSource.SAMPLE_ALBUM)
         },
@@ -2897,10 +2870,6 @@ private fun SmartAlbumSourcePicker(
           )
         },
         onClick = {
-          logButtonClick(
-            "smartalbum_select_source",
-            buttonId = SmartAlbumSource.USER_PHOTOS.name.lowercase(),
-          )
           expanded = false
           onSourceSelected(SmartAlbumSource.USER_PHOTOS)
         },
@@ -2923,7 +2892,7 @@ private fun CameraSearchHeaderBar(
   ) {
     IconButton(
       onClick = {
-        logButtonClick("smartalbum_camera_search_back")
+        
         onBack()
       }
     ) {
@@ -3001,7 +2970,7 @@ private fun CameraPermissionRequestContent(
           color = MaterialTheme.colorScheme.primary,
           modifier =
             Modifier.clickable {
-              logButtonClick("smartalbum_grant_camera_permission")
+              
               onRequestPermission()
             },
         ) {
@@ -3103,9 +3072,6 @@ private fun LiveCameraSearchContent(
           shadowElevation = 4.dp,
           modifier =
             Modifier.size(56.dp).clickable {
-              logButtonClick(
-                if (isCameraSearchPaused) "smartalbum_resume_camera" else "smartalbum_pause_camera"
-              )
               searchViewModel.toggleCameraSearchPause()
             },
         ) {
@@ -3128,7 +3094,7 @@ private fun LiveCameraSearchContent(
           shadowElevation = 4.dp,
           modifier =
             Modifier.size(56.dp).clickable {
-              logButtonClick("smartalbum_switch_camera")
+              
               cameraSelector =
                 if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
                   CameraSelector.DEFAULT_BACK_CAMERA
@@ -3175,7 +3141,7 @@ private fun LiveCameraSearchContent(
               match = match,
               photoLibraryService = searchViewModel.photoLibraryService,
               onClick = {
-                logButtonClick("smartalbum_select_camera_search_result")
+                
                 onSelectMatch(match)
               },
             )

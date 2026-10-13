@@ -96,6 +96,7 @@ import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -130,6 +131,7 @@ import com.google.ai.edge.gallery.ui.common.rememberDelayedAnimationProgress
 import com.google.ai.edge.gallery.ui.common.tos.AppTosDialog
 import com.google.ai.edge.gallery.ui.common.tos.TosViewModel
 import com.google.ai.edge.gallery.ui.modelmanager.ModelManagerViewModel
+import com.google.ai.edge.gallery.ui.theme.backgroundDark
 import com.google.ai.edge.gallery.ui.theme.customColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -168,7 +170,7 @@ fun HomeScreen(
 ) {
   val uiState by modelManagerViewModel.uiState.collectAsState()
   var showSettingsDialog by remember { mutableStateOf(false) }
-  var showTosDialog by remember { mutableStateOf(!tosViewModel.getIsTosAccepted()) }
+  var showTosDialog = false // by remember { mutableStateOf(!tosViewModel.getIsTosAccepted()) }
   val scope = rememberCoroutineScope()
   val context = LocalContext.current
   val isDevBuild = context.packageName.endsWith(".dev")
@@ -587,9 +589,20 @@ private fun IntroText(enableAnimation: Boolean) {
     )
     append(".")
   }
+
   Text(
     introText,
     style = MaterialTheme.typography.bodyMedium,
+    modifier =
+      Modifier.graphicsLayer {
+        alpha = progress
+        translationY = (CONTENT_COMPOSABLES_OFFSET_Y.dp * (1 - progress)).toPx()
+      },
+  )
+  Text("This unofficial version includes" +
+          " privacy-focused and other changes that differ from the official app. Review this app's source code repository to learn more.",
+    style = MaterialTheme.typography.bodyMedium,
+    color = lerp(Color.White, Color.Red, 0.6f),
     modifier =
       Modifier.graphicsLayer {
         alpha = progress

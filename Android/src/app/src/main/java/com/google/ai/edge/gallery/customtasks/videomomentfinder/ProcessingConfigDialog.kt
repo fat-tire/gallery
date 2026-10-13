@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.ui.common.SMALL_BUTTON_CONTENT_PADDING
 import kotlin.math.roundToInt
 
@@ -176,10 +175,6 @@ fun ProcessingConfigDialog(
           for (preset in ProcessingPreset.entries) {
             OutlinedButton(
               onClick = {
-                logButtonClick(
-                  "videomomentfinder_config_preset",
-                  buttonId = preset.name.lowercase(),
-                )
                 windowDuration = preset.windowDurationSec
                 framesPerWindow = preset.framesPerWindow
                 overlapDuration = preset.overlapDurationSec
@@ -263,12 +258,6 @@ fun ProcessingConfigDialog(
     confirmButton = {
       Button(
         onClick = {
-          logButtonClick("videomomentfinder_config_apply") {
-            putInt("frames_per_window", framesPerWindow)
-            putInt("window_duration_sec", windowDuration)
-            putInt("overlap_duration_sec", overlapDuration)
-            putBoolean("include_audio", includeAudio)
-          }
           onApply(framesPerWindow, windowDuration, overlapDuration, includeAudio)
         },
         enabled = confirmEnabledWhenUnchanged || isModified,
@@ -280,7 +269,6 @@ fun ProcessingConfigDialog(
     dismissButton = {
       OutlinedButton(
         onClick = {
-          logButtonClick("videomomentfinder_config_cancel")
           onDismiss()
         },
         contentPadding = SMALL_BUTTON_CONTENT_PADDING,

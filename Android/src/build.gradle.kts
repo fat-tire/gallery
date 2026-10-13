@@ -17,9 +17,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
   alias(libs.plugins.android.application) apply false
-  alias(libs.plugins.google.services) apply false
-  alias(libs.plugins.kotlin.android) apply false
   alias(libs.plugins.kotlin.compose) apply false
   alias(libs.plugins.hilt.application) apply false
   alias(libs.plugins.ksp) apply false
+}
+
+configurations.all {
+    // dev doesn't need to be tracked either
+    exclude(group = "com.android.tools.analytics-library", module = "shared")
+    exclude(group = "com.android.tools.analytics-library", module = "protos")
+    exclude(group = "com.android.tools.analytics-library", module = "tracker")
+    // nuke it from orbit
+    exclude(group = "com.google.firebase", module = "firebase-analytics")
+    exclude(group = "com.google.firebase", module = "firebase-measurement-connector")
+    exclude(group = "com.google.android.gms", module = "play-services-measurement")
+    exclude(group = "com.google.android.gms", module = "play-services-measurement-sdk")
 }

@@ -202,7 +202,6 @@ internal constructor(
   ioDispatcher: CoroutineDispatcher,
   private val timeSource: TimeSource = TimeSource.Monotonic,
   config: MetricsTrackerConfig = MetricsTrackerConfig(),
-  private val metricsLogger: MetricsLogger = MetricsLogger(model = model, taskId = taskId),
   private val memoryMonitor: PeriodicSensorMonitor<MemoryMetrics>? =
     if (config.enableSystemSampling) {
       MemoryMonitor(
@@ -289,7 +288,6 @@ internal constructor(
   @Synchronized
   override fun onModelInitialized() {
     refreshSessionTracker()
-    metricsLogger.logModelInitialization()
     if (model.initStatusFlow.value !is Model.InitializationStatus.Failed) {
       emitLiveSnapshot()
     }
@@ -406,7 +404,6 @@ internal constructor(
             }
           }
       }
-    metricsLogger.logMetrics(finalMetrics)
     return finalMetrics
   }
 

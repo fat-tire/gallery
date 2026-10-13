@@ -42,10 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.common.getModelStorageDir
-import com.google.ai.edge.gallery.common.logErrorToFirebase
 import com.google.ai.edge.gallery.customtasks.common.CustomTask
 import com.google.ai.edge.gallery.customtasks.common.CustomTaskData
 import com.google.ai.edge.gallery.data.BuiltInTaskId
@@ -107,7 +105,6 @@ class SmartAlbumTask @Inject constructor(@ApplicationContext private val context
       onDone("")
     } catch (e: Throwable) {
       Log.e(TAG, "Failed to initialize Gemma embedding model", e)
-      logErrorToFirebase(GalleryEvent.GENERATE_ACTION, "smartalbum_model_init_error", e.message)
       val unused = GemmaEmbeddingModelStore.removeEmbedders(model.getPath(context))
       onDone(e.message ?: "Failed to initialize Gemma embedding model")
     }

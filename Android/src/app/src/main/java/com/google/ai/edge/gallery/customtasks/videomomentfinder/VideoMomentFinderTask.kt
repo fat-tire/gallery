@@ -19,9 +19,7 @@ package com.google.ai.edge.gallery.customtasks.videomomentfinder
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logErrorToFirebase
 import com.google.ai.edge.gallery.customtasks.common.CustomTask
 import com.google.ai.edge.gallery.customtasks.common.CustomTaskData
 import com.google.ai.edge.gallery.data.Accelerator
@@ -87,11 +85,6 @@ class VideoMomentFinderTask @Inject constructor(@ApplicationContext private val 
       onDone("")
     } catch (e: Throwable) {
       Log.e(TAG, "Failed to initialize Gemma embedder", e)
-      logErrorToFirebase(
-        GalleryEvent.GENERATE_ACTION,
-        "videomomentfinder_model_init_error",
-        e.message,
-      )
       // Null only when getPath itself failed, in which case nothing can have been registered.
       modelPath?.let { path ->
         GemmaEmbeddingModelStore.closeServices(path)

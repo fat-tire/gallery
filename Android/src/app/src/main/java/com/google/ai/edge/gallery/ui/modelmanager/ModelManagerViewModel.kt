@@ -40,6 +40,7 @@ import com.google.ai.edge.gallery.data.CategoryInfo
 import com.google.ai.edge.gallery.data.Config
 import com.google.ai.edge.gallery.data.ConfigKeys
 import com.google.ai.edge.gallery.data.DEFAULT_MAX_TOKEN
+import com.google.ai.edge.gallery.data.DEFAULT_REPO_NAME
 import com.google.ai.edge.gallery.data.DataStoreRepository
 import com.google.ai.edge.gallery.data.DownloadRepository
 import com.google.ai.edge.gallery.data.EMPTY_MODEL
@@ -69,7 +70,6 @@ import com.google.ai.edge.gallery.data.markInitializationFailed
 import com.google.ai.edge.gallery.data.markInitializationStarted
 import com.google.ai.edge.gallery.data.markInitialized
 import com.google.ai.edge.gallery.data.resetInitialization
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.huggingface.HuggingFaceApiClient
 import com.google.ai.edge.gallery.proto.AccessTokenData
 import com.google.ai.edge.gallery.proto.HfModelItemProto
@@ -110,6 +110,10 @@ private const val ALLOWLIST_BASE_URL =
   "https://raw.githubusercontent.com/google-ai-edge/gallery/refs/heads/main/model_allowlists"
 private const val PLACEHOLDER_FILENAME = "placeholder"
 private const val UNPACKED_FILE_EXT = "unpacked"
+private const val ALLOWLIST_BASE_URL_1 =
+  "https://raw.githubusercontent.com/"
+private const val ALLOWLIST_BASE_URL_2 =
+  "/gallery/refs/heads/main/model_allowlists"
 
 /**
  * Location of an optional local model allowlist used for testing.
@@ -976,7 +980,6 @@ constructor(
    */
   fun saveFirebaseAnalytics(enabled: Boolean) {
     dataStoreRepository.saveFirebaseAnalytics(enabled = enabled)
-    firebaseAnalytics?.setAnalyticsCollectionEnabled(enabled)
   }
 
   /**
@@ -1272,6 +1275,15 @@ constructor(
     }
   }
 
+
+  fun saveRepoName(repoName: String) {
+    dataStoreRepository.saveRepoName(repoName)
+  }
+
+  fun getRepoName() : String {
+    return dataStoreRepository.getRepoName()
+  }
+
   fun loadModelAllowlist() {
     _uiState.update { it.copy(loadingModelAllowlist = true, loadingModelAllowlistError = "") }
 
@@ -1293,7 +1305,7 @@ constructor(
         if (modelAllowlist == null) {
           // Load from github.
           var version = BuildConfig.VERSION_NAME.replace(".", "_")
-          val url = getAllowlistUrl(version)
+          val url = getAllowlistUrl(version, getRepoName())
           Log.d(TAG, "Loading model allowlist from internet. Url: $url")
           val data = getJsonResponse<ModelAllowlist>(url = url)
           modelAllowlist = data?.jsonObj
@@ -1915,8 +1927,12 @@ constructor(
   }
 }
 
-private fun getAllowlistUrl(version: String): String {
-  return "$ALLOWLIST_BASE_URL/${version}.json"
+private fun getAllowlistUrl(version: String, repoName: String): String {
+  var repo = repoName
+  if (repo == "") {
+    repo = DEFAULT_REPO_NAME
+  }
+  return "$ALLOWLIST_BASE_URL_1$repo$ALLOWLIST_BASE_URL_2/${version}.json"
 }
 
 /**

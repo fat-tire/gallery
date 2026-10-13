@@ -38,6 +38,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -63,9 +64,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.proto.McpAuth
 import java.net.URI
 
@@ -300,13 +299,6 @@ fun AddMcpServerFromUrlDialog(
               enabled = textFieldValue.text.trim().isNotEmpty(),
               onClick = {
                 Log.d(TAG, "Analytics: mcp_management, action=add_server, status=attempt")
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.MCP_MANAGEMENT.id,
-                  Bundle().apply {
-                    putString("action", "add_server")
-                    putString("status", "attempt")
-                  },
-                )
                 val url = textFieldValue.text.trim()
                 if (url.isNotEmpty()) {
                   if (mcpManagerViewModel.hasMcpServer(url)) {

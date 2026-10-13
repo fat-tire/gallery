@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.ui.common.SMALL_BUTTON_CONTENT_PADDING
 
 /** Allowed bounds for the number of search results returned for a query. */
@@ -82,7 +81,6 @@ fun TopKBottomSheet(initialTopK: Int, onDismiss: () -> Unit, onApply: (Int) -> U
       )
       Button(
         onClick = {
-          logButtonClick("videomomentfinder_apply_top_k")
           onApply(topK)
         },
         modifier = Modifier.align(Alignment.End).padding(bottom = 24.dp),

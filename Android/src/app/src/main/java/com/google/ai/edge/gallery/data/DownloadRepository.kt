@@ -41,9 +41,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.ai.edge.gallery.AppLifecycleProvider
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.worker.DownloadWorker
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -279,10 +277,6 @@ class DefaultDownloadRepository(
                 downloadStartTimeSharedPreferences.edit {
                   putLong(model.name, System.currentTimeMillis())
                 }
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.MODEL_DOWNLOAD.id,
-                  bundleOf("event_type" to "start", "model_id" to model.name),
-                )
               }
 
               WorkInfo.State.RUNNING -> {
@@ -350,16 +344,6 @@ class DefaultDownloadRepository(
                   )
                 }
 
-                val startTime = downloadStartTimeSharedPreferences.getLong(model.name, 0L)
-                val duration = System.currentTimeMillis() - startTime
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.MODEL_DOWNLOAD.id,
-                  bundleOf(
-                    "event_type" to "success",
-                    "model_id" to model.name,
-                    "duration_ms" to duration,
-                  ),
-                )
                 downloadStartTimeSharedPreferences.edit { remove(model.name) }
               }
 
@@ -403,16 +387,6 @@ class DefaultDownloadRepository(
                   ModelDownloadStatus(status = status, errorMessage = errorMessage),
                 )
 
-                val startTime = downloadStartTimeSharedPreferences.getLong(model.name, 0L)
-                val duration = System.currentTimeMillis() - startTime
-                firebaseAnalytics?.logEvent(
-                  GalleryEvent.MODEL_DOWNLOAD.id,
-                  bundleOf(
-                    "event_type" to "failure",
-                    "model_id" to model.name,
-                    "duration_ms" to duration,
-                  ),
-                )
                 downloadStartTimeSharedPreferences.edit { remove(model.name) }
               }
 

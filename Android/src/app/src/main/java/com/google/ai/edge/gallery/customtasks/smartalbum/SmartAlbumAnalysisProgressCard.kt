@@ -73,7 +73,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -119,7 +118,6 @@ fun SmartAlbumAnalysisProgressCard(
           duration = SnackbarDuration.Short,
         )
       if (result == SnackbarResult.ActionPerformed) {
-        logButtonClick("smartalbum_notify_me_undo")
         onNotificationCancelled()
       }
     }
@@ -244,10 +242,6 @@ fun SmartAlbumAnalysisProgressCard(
           color = MaterialTheme.colorScheme.primaryContainer,
           modifier =
             Modifier.clickable {
-              logButtonClick(
-                if (isIndexingPaused) "smartalbum_resume_analyzing"
-                else "smartalbum_pause_analyzing"
-              )
               onPauseResumeClick()
             },
         ) {
@@ -293,7 +287,6 @@ fun SmartAlbumAnalysisProgressCard(
           Row(
             modifier =
               Modifier.clickable {
-                  logButtonClick("smartalbum_notify_me")
                   if (
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                       ContextCompat.checkSelfPermission(
@@ -478,10 +471,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
           buttonText = stringResource(R.string.smartalbum_pause),
           buttonIcon = Icons.Default.Pause,
           onButtonClick = {
-            logButtonClick(
-              "smartalbum_pause_collection",
-              buttonId = SmartAlbumSource.SAMPLE_ALBUM.name.lowercase(),
-            )
             onPauseCollectionClick(SmartAlbumSource.SAMPLE_ALBUM)
           },
         )
@@ -501,10 +490,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
             else stringResource(R.string.smartalbum_resume),
           buttonIcon = Icons.Default.PlayArrow,
           onButtonClick = {
-            logButtonClick(
-              "smartalbum_resume_collection",
-              buttonId = SmartAlbumSource.SAMPLE_ALBUM.name.lowercase(),
-            )
             onResumeCollectionClick(SmartAlbumSource.SAMPLE_ALBUM)
           },
         )
@@ -524,10 +509,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
             else stringResource(R.string.smartalbum_resume),
           buttonIcon = Icons.Default.PlayArrow,
           onButtonClick = {
-            logButtonClick(
-              "smartalbum_start_collection",
-              buttonId = SmartAlbumSource.SAMPLE_ALBUM.name.lowercase(),
-            )
             onStartNowCollectionClick(SmartAlbumSource.SAMPLE_ALBUM)
           },
         )
@@ -560,10 +541,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
           buttonText = stringResource(R.string.smartalbum_pause),
           buttonIcon = Icons.Default.Pause,
           onButtonClick = {
-            logButtonClick(
-              "smartalbum_pause_collection",
-              buttonId = SmartAlbumSource.USER_PHOTOS.name.lowercase(),
-            )
             onPauseCollectionClick(SmartAlbumSource.USER_PHOTOS)
           },
         )
@@ -583,10 +560,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
             else stringResource(R.string.smartalbum_resume),
           buttonIcon = Icons.Default.PlayArrow,
           onButtonClick = {
-            logButtonClick(
-              "smartalbum_resume_collection",
-              buttonId = SmartAlbumSource.USER_PHOTOS.name.lowercase(),
-            )
             onResumeCollectionClick(SmartAlbumSource.USER_PHOTOS)
           },
         )
@@ -606,10 +579,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
             else stringResource(R.string.smartalbum_resume),
           buttonIcon = Icons.Default.PlayArrow,
           onButtonClick = {
-            logButtonClick(
-              "smartalbum_start_collection",
-              buttonId = SmartAlbumSource.USER_PHOTOS.name.lowercase(),
-            )
             onStartNowCollectionClick(SmartAlbumSource.USER_PHOTOS)
           },
         )
@@ -684,10 +653,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
       Row(
         modifier =
           Modifier.fillMaxWidth().clickable {
-            logButtonClick(
-              if (isExpanded) "smartalbum_collapse_progress_card"
-              else "smartalbum_expand_progress_card"
-            )
             onToggleExpand()
           },
         verticalAlignment = Alignment.CenterVertically,
@@ -731,10 +696,6 @@ fun SmartAlbumExpandableAnalysisProgressCard(
             color = MaterialTheme.colorScheme.primaryContainer,
             modifier =
               Modifier.clickable {
-                logButtonClick(
-                  if (isAllPaused) "smartalbum_resume_all_collections"
-                  else "smartalbum_pause_all_collections"
-                )
                 onPauseResumeAllClick()
               },
           ) {

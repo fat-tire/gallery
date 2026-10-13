@@ -22,7 +22,6 @@ import android.util.Log
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.agent.AgentRuntimeExecutor
 import com.google.ai.edge.gallery.agent.sessions.LlmSessionManager
@@ -31,7 +30,6 @@ import com.google.ai.edge.gallery.common.processLlmResponse
 import com.google.ai.edge.gallery.data.Config
 import com.google.ai.edge.gallery.data.DataStoreRepository
 import com.google.ai.edge.gallery.data.Model
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.proto.ChatSessionProto
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -410,28 +408,10 @@ abstract class ChatViewModel(
       TAG,
       "Analytics: context_compression, capability_name=$taskId, model_id=${model.name}, model_version=${model.downloadInfo.version}, trigger_type=${triggerType.value}, default_to_behavior=$defaultToBehavior",
     )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.CONTEXT_COMPRESSION.id,
-      Bundle().apply {
-        putString("capability_name", taskId)
-        putString("model_id", model.name)
-        putString("model_version", model.downloadInfo.version)
-        putString("trigger_type", triggerType.value)
-        putBoolean("default_to_behavior", defaultToBehavior)
-      },
-    )
     if (triggerType == ContextCompactionTriggerType.MANUAL && defaultToBehavior) {
       Log.d(
         TAG,
         "Analytics: auto_compaction_enable, capability_name=$taskId, model_id=${model.name}, model_version=${model.downloadInfo.version}",
-      )
-      firebaseAnalytics?.logEvent(
-        GalleryEvent.AUTO_COMPACTION_ENABLE.id,
-        Bundle().apply {
-          putString("capability_name", taskId)
-          putString("model_id", model.name)
-          putString("model_version", model.downloadInfo.version)
-        },
       )
     }
     val thisJob = compactionJob

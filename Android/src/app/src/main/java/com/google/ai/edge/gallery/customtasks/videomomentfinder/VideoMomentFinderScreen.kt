@@ -60,7 +60,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.data.Model
 import com.google.ai.edge.gallery.proto.VideoClip
 import com.google.ai.edge.gallery.proto.VideoMomentProject
@@ -148,7 +147,6 @@ fun VideoMomentFinderScreen(
                 label = { Text(stringResource(R.string.videomomentfinder_tab_videos)) },
                 selected = selectedTab == 0,
                 onClick = {
-                  logButtonClick("videomomentfinder_tab_videos")
                   selectedTab = 0
                 },
               )
@@ -163,7 +161,6 @@ fun VideoMomentFinderScreen(
                 label = { Text(stringResource(R.string.videomomentfinder_tab_moments)) },
                 selected = selectedTab == 1,
                 onClick = {
-                  logButtonClick("videomomentfinder_tab_moments")
                   selectedTab = 1
                 },
               )

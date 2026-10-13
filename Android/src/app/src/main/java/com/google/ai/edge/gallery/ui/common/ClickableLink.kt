@@ -41,8 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
-import com.google.ai.edge.gallery.GalleryEvent
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.ui.theme.customColors
 
 @Composable
@@ -123,10 +121,6 @@ fun ClickableLink(
 }
 
 private fun logResourceLinkClick(url: String) {
-  firebaseAnalytics?.logEvent(
-    GalleryEvent.RESOURCE_LINK_CLICK.id,
-    Bundle().apply { putString("link_destination", url) },
-  )
 }
 
 /**

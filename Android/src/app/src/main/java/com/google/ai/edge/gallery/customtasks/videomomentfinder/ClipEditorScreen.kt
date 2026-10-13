@@ -78,10 +78,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
-import com.google.ai.edge.gallery.common.logErrorToFirebase
 import com.google.ai.edge.gallery.proto.VideoClip
 import com.google.ai.edge.gallery.proto.VideoMomentProject
 import com.google.ai.edge.gallery.ui.theme.onPrimaryContainerDark
@@ -233,7 +230,6 @@ fun ClipEditorScreen(
         )
         IconButton(
           onClick = {
-            logButtonClick("videomomentfinder_clip_editor_close")
             onClose()
           },
           modifier = Modifier.align(Alignment.CenterEnd).size(48.dp),
@@ -286,7 +282,6 @@ fun ClipEditorScreen(
             contentDescription = "Previous clip",
             enabled = activeIndex > 0,
             onClick = {
-              logButtonClick("videomomentfinder_clip_editor_previous_clip")
               if (activeIndex > 0) {
                 currentClipIndex = activeIndex - 1
                 searchResults.getOrNull(activeIndex - 1)?.let { prevClip ->
@@ -319,7 +314,6 @@ fun ClipEditorScreen(
             contentDescription = "Next clip",
             enabled = activeIndex < searchResults.size - 1,
             onClick = {
-              logButtonClick("videomomentfinder_clip_editor_next_clip")
               if (activeIndex < searchResults.size - 1) {
                 currentClipIndex = activeIndex + 1
                 searchResults.getOrNull(activeIndex + 1)?.let { nextClip ->
@@ -360,13 +354,6 @@ fun ClipEditorScreen(
           // Center play/pause overlay button to toggle video playback.
           IconButton(
             onClick = {
-              logButtonClick(
-                if (isPlaying) {
-                  "videomomentfinder_clip_editor_pause"
-                } else {
-                  "videomomentfinder_clip_editor_play"
-                }
-              )
               if (isPlaying) {
                 exoPlayer.pause()
               } else {
@@ -454,10 +441,6 @@ fun ClipEditorScreen(
             // Logged inside the guard: `enabled` lags a frame behind `isSaving`, so a double tap
             // can reach here twice while only the first tap actually saves.
             if (!isSaving && !isExporting && viewModel != null) {
-              logButtonClick(
-                if (savedClip != null) "videomomentfinder_update_clip"
-                else "videomomentfinder_save_clip"
-              )
               isSaving = true
               val scope = viewModel.viewModelScope
               scope.launch {
@@ -475,12 +458,6 @@ fun ClipEditorScreen(
                     if (savedClip != null) clipUpdatedMessage else clipSavedMessage
                   )
                 } else {
-                  logErrorToFirebase(
-                    GalleryEvent.BUTTON_CLICKED,
-                    if (savedClip != null) "videomomentfinder_update_clip_error"
-                    else "videomomentfinder_save_clip_error",
-                    null,
-                  )
                   snackbarHostState.showSnackbar(failedToSaveMessage)
                 }
               }
@@ -529,7 +506,6 @@ fun ClipEditorScreen(
           onClick = {
             // Logged inside the guard, for the same reason as the save button above.
             if (!isExporting && !isSaving) {
-              logButtonClick("videomomentfinder_download_clip")
               isExporting = true
               val scope = viewModel?.viewModelScope ?: coroutineScope
               scope.launch {
@@ -544,11 +520,6 @@ fun ClipEditorScreen(
                 if (success) {
                   snackbarHostState.showSnackbar(clipSavedToAlbumMessage)
                 } else {
-                  logErrorToFirebase(
-                    GalleryEvent.BUTTON_CLICKED,
-                    "videomomentfinder_download_clip_error",
-                    null,
-                  )
                   snackbarHostState.showSnackbar(failedToSaveMessage)
                 }
               }

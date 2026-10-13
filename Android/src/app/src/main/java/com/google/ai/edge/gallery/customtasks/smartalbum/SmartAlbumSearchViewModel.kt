@@ -22,11 +22,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.common.ImageUtils
-import com.google.ai.edge.gallery.common.logErrorToFirebase
 import com.google.ai.edge.gallery.data.BuiltInTaskId
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.services.photolibrary.PhotoAsset
 import com.google.ai.edge.gallery.services.photolibrary.PhotoLibraryService
 import com.google.ai.edge.gallery.services.semanticretrieval.SemanticRetrievalResult
@@ -355,7 +352,6 @@ class SmartAlbumSearchViewModel(
           }
         } catch (e: Exception) {
           Log.e(TAG, "Failed to index added media ${asset.id}", e)
-          logErrorToFirebase(GalleryEvent.GENERATE_ACTION, errorEvent, e.message)
         }
       }
       currentRetrievalService.saveToDisk()
@@ -501,11 +497,6 @@ class SmartAlbumSearchViewModel(
         throw e // Allow standard cooperative cancellation to do its job
       } catch (e: Exception) {
         Log.e(TAG, "Failed camera search inference", e)
-        logErrorToFirebase(
-          GalleryEvent.GENERATE_ACTION,
-          "smartalbum_camera_search_error",
-          e.message,
-        )
       } finally {
         _isCameraSearching.value = false
       }
@@ -641,13 +632,6 @@ class SmartAlbumSearchViewModel(
     }
     _isSearching.value = true
 
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.GENERATE_ACTION.id,
-      Bundle().apply {
-        putString("capability_name", BuiltInTaskId.SMART_ALBUM)
-        putString("action", "search_similar_image")
-      },
-    )
 
     searchJob = viewModelScope.launch {
       try {
@@ -673,11 +657,6 @@ class SmartAlbumSearchViewModel(
         throw e
       } catch (e: Exception) {
         Log.e(TAG, "Failed to search similar images", e)
-        logErrorToFirebase(
-          GalleryEvent.GENERATE_ACTION,
-          "smartalbum_similar_image_search_error",
-          e.message,
-        )
         if (_uiState.value !is SearchUiState.Results) {
           _uiState.value = SearchUiState.Results(emptyList())
         }
@@ -695,21 +674,12 @@ class SmartAlbumSearchViewModel(
   }
 
   private suspend fun executeTextSearch(query: String) {
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.GENERATE_ACTION.id,
-      Bundle().apply {
-        putString("capability_name", BuiltInTaskId.SMART_ALBUM)
-        putString("action", "search")
-        putInt("query_length", query.trim().length)
-      },
-    )
     try {
       val results = currentRetrievalService.retrieveEntities(query, limit = 1000)
       updateSearchResults(results)
     } catch (e: CancellationException) {
       throw e
     } catch (e: Exception) {
-      logErrorToFirebase(GalleryEvent.GENERATE_ACTION, "smartalbum_text_search_error", e.message)
       if (_uiState.value !is SearchUiState.Results) {
         _uiState.value = SearchUiState.Results(emptyList())
       }

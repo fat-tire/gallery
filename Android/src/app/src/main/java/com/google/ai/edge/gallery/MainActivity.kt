@@ -56,7 +56,6 @@ import com.google.ai.edge.gallery.ui.modelmanager.ModelManagerViewModel
 import com.google.ai.edge.gallery.ui.theme.GalleryTheme
 import com.google.ai.edge.litertlm.ExperimentalApi
 import com.google.ai.edge.litertlm.ExperimentalFlags
-import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.CopyOnWriteArraySet
 import kotlinx.coroutines.delay
@@ -87,7 +86,7 @@ class MainActivity : ComponentActivity(), VirtualDevicePermissionsHost {
     // Debug: Dump all intent extras to see what FCM unloads
     intent.extras?.let { extras ->
       for (key in extras.keySet()) {
-        Log.d(TAG, "onCreate Extra -> Key: $key, Value: ${extras.get(key)}")
+        Log.d(TAG, "onCreate Extra -> Key: $key, Value: ${extras.getString(key)}")
       }
     }
 
@@ -230,17 +229,7 @@ class MainActivity : ComponentActivity(), VirtualDevicePermissionsHost {
 
   override fun onResume() {
     super.onResume()
-
-    firebaseAnalytics?.logEvent(
-      FirebaseAnalytics.Event.APP_OPEN,
-      bundleOf(
-        "app_version" to BuildConfig.VERSION_NAME,
-        "app_platform" to "Android",
-        "os_version" to Build.VERSION.SDK_INT.toString(),
-        "device_model" to Build.MODEL,
-      ),
-    )
-  }
+ }
 
   companion object {
     private const val TAG = "AGMainActivity"

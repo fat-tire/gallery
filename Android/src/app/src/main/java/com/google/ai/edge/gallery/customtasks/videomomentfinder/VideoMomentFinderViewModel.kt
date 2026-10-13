@@ -28,12 +28,9 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.ai.edge.gallery.GalleryEvent
-import com.google.ai.edge.gallery.common.logErrorToFirebase
 import com.google.ai.edge.gallery.common.openSafeInputStream
 import com.google.ai.edge.gallery.data.BuiltInTaskId
 import com.google.ai.edge.gallery.di.IoDispatcher
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.proto.VideoClip
 import com.google.ai.edge.gallery.proto.VideoMomentFinderData
 import com.google.ai.edge.gallery.proto.VideoMomentProject
@@ -344,11 +341,6 @@ constructor(
             // The original copy is still playable, only seeking into it stays broken, so the import
             // continues rather than failing outright.
             Log.e(TAG, "Failed to rewrite the fragmented video of project $projectId", e)
-            logErrorToFirebase(
-              GalleryEvent.BUTTON_CLICKED,
-              "videomomentfinder_add_video_normalize_error",
-              e.message,
-            )
           }
 
           // Extract duration and thumbnail
@@ -382,11 +374,6 @@ constructor(
             }
           } catch (e: Exception) {
             Log.e(TAG, "Error extracting video metadata or thumbnail for project $projectId", e)
-            logErrorToFirebase(
-              GalleryEvent.BUTTON_CLICKED,
-              "videomomentfinder_add_video_metadata_error",
-              e.message,
-            )
           } finally {
             retriever.release()
           }
@@ -537,11 +524,6 @@ constructor(
           throw e
         } catch (e: Exception) {
           Log.e(TAG, "Failed to delete indexed windows for project ${project.id}", e)
-          logErrorToFirebase(
-            GalleryEvent.BUTTON_CLICKED,
-            "videomomentfinder_delete_project_windows_error",
-            e.message,
-          )
         }
 
         // Delete the directory and its contents
@@ -692,14 +674,6 @@ constructor(
   fun searchForMoment(project: VideoMomentProject, query: String) {
     viewModelScope.launch {
       // Log the search. Only the length is reported: the query itself is user content.
-      firebaseAnalytics?.logEvent(
-        GalleryEvent.GENERATE_ACTION.id,
-        Bundle().apply {
-          putString("capability_name", BuiltInTaskId.VIDEO_MOMENT_FINDER)
-          putString("action", "search")
-          putInt("query_length", query.trim().length)
-        },
-      )
 
       // Step 1: Update UI state to indicate that a search is in progress. Previous results are
       // cleared here so that no stale results or scrubber intervals survive a new search or an
@@ -719,22 +693,12 @@ constructor(
           val service = semanticRetrievalService
           if (service == null) {
             Log.w(TAG, "Semantic retrieval service is not available for search")
-            logErrorToFirebase(
-              GalleryEvent.GENERATE_ACTION,
-              "videomomentfinder_search_service_unavailable",
-              null,
-            )
             return@withContext
           }
 
           // Step 3: Validate video duration and local video file existence.
           val durationMs = project.durationMs
           if (durationMs <= 0L) {
-            logErrorToFirebase(
-              GalleryEvent.GENERATE_ACTION,
-              "videomomentfinder_search_invalid_duration",
-              null,
-            )
             return@withContext
           }
 
@@ -742,11 +706,6 @@ constructor(
             File(context.getExternalFilesDir(null), "$VIDEO_MOMENT_FINDER_DIR/${project.id}")
           val videoFile = File(projectDir, VIDEO_FILE_NAME)
           if (!videoFile.exists()) {
-            logErrorToFirebase(
-              GalleryEvent.GENERATE_ACTION,
-              "videomomentfinder_search_video_file_missing",
-              null,
-            )
             return@withContext
           }
 
@@ -766,11 +725,6 @@ constructor(
             } catch (e: Exception) {
               Log.d(TAG, "Failed semantic search query: '$query'")
               Log.e(TAG, "Failed to run semantic search (queryLength=${query.length})", e)
-              logErrorToFirebase(
-                GalleryEvent.GENERATE_ACTION,
-                "videomomentfinder_search_retrieval_error",
-                e.message,
-              )
               return@withContext
             }
 
@@ -864,11 +818,7 @@ constructor(
             searchResults.clear()
             if (t is Exception && t !is CancellationException) {
               Log.e(TAG, "Error extracting frames for search results", t)
-              logErrorToFirebase(
-                GalleryEvent.GENERATE_ACTION,
-                "videomomentfinder_search_frame_extraction_error",
-                t.message,
-              )
+
             } else {
               throw t
             }
@@ -951,11 +901,6 @@ constructor(
         }
       } catch (e: Exception) {
         Log.e(TAG, "Failed to generate thumbnail for clip $targetClipId", e)
-        logErrorToFirebase(
-          GalleryEvent.BUTTON_CLICKED,
-          "videomomentfinder_clip_thumbnail_error",
-          e.message,
-        )
       } finally {
         retriever.release()
       }
@@ -1121,11 +1066,6 @@ constructor(
         throw e
       } catch (e: Exception) {
         Log.e(TAG, "Failed to reconcile processed flags against the vector store", e)
-        logErrorToFirebase(
-          GalleryEvent.GENERATE_ACTION,
-          "videomomentfinder_reconcile_error",
-          e.message,
-        )
       }
     }
   }
@@ -1152,20 +1092,6 @@ constructor(
     searchQueryAfterProcess: String? = null,
   ) {
     // Log the indexing pass. Logged before the coroutine so every requested pass is counted.
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.GENERATE_ACTION.id,
-      Bundle().apply {
-        putString("capability_name", BuiltInTaskId.VIDEO_MOMENT_FINDER)
-        putString("action", "process_project")
-        putInt("frames_per_window", framesPerWindow)
-        putInt("window_duration_sec", windowDurationSec)
-        putInt("overlap_duration_sec", overlapDurationSec)
-        putInt("top_k", topK)
-        putBoolean("include_audio", includeAudio)
-        putLong("video_duration_ms", project.durationMs)
-        putBoolean("is_reprocess", project.isProcessed)
-      },
-    )
 
     // Enter the processing state synchronously so no caller and no recomposition can observe the
     // gap between asking for a pass and the coroutine starting it. During that gap the project
@@ -1508,17 +1434,6 @@ constructor(
 
         // Logged separately from the pass request because whether audio was actually interleaved
         // is only known once the model and the video's audio track have both been inspected.
-        firebaseAnalytics?.logEvent(
-          GalleryEvent.GENERATE_ACTION.id,
-          Bundle().apply {
-            putString("capability_name", BuiltInTaskId.VIDEO_MOMENT_FINDER)
-            putString("action", "process_project_complete")
-            putBoolean("include_audio", includeAudio)
-            putBoolean("audio_supported", audioSupported)
-            putBoolean("audio_interleaved", interleaveAudio)
-            putInt("indexed_window_count", indexedWindowCount)
-          },
-        )
 
         // Step 6: Update UI state with the processed project and clear progress.
         _uiState.update { state ->
@@ -1612,17 +1527,5 @@ constructor(
     errorMessage: String? = null,
     causedByVideo: Boolean = false,
   ) {
-    logErrorToFirebase(GalleryEvent.GENERATE_ACTION, errorType, errorMessage)
-    _uiState.update { state ->
-      if (isCurrentProcessingProject(projectId, state)) {
-        state.copy(
-          projectProcessProgress = null,
-          projectProcessFailed = true,
-          projectProcessFailedDueToVideo = causedByVideo,
-        )
-      } else {
-        state
-      }
-    }
   }
 }

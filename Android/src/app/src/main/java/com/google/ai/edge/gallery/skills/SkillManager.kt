@@ -22,13 +22,11 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.common.getJsonResponse
 import com.google.ai.edge.gallery.common.openSafeInputStream
 import com.google.ai.edge.gallery.data.AllowedSkill
 import com.google.ai.edge.gallery.data.DataStoreRepository
 import com.google.ai.edge.gallery.data.SkillAllowlist
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.proto.Skill
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -48,6 +46,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.collections.filter
+import kotlin.collections.map
 
 private const val TAG = "AGSkillManager"
 
@@ -437,13 +437,6 @@ constructor(
       }
     }
 
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      getSkillLoggingParams(skill, featuredSkills).apply {
-        putString("action", SkillAction.ADD.value)
-      },
-    )
-
     if (addToDataStore) {
       // Add skill to data store.
       coroutineScope.launch { dataStoreRepository.addSkill(skill) }
@@ -464,10 +457,6 @@ constructor(
     Log.d(
       TAG,
       "Analytics: skill_management, action=${SkillAction.DELETE.value}, params=$loggingParams",
-    )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      loggingParams.apply { putString("action", SkillAction.DELETE.value) },
     )
 
     // Update state.
@@ -506,10 +495,6 @@ constructor(
       Log.d(
         TAG,
         "Analytics: skill_management, action=${SkillAction.DELETE.value}, params=$loggingParams",
-      )
-      firebaseAnalytics?.logEvent(
-        GalleryEvent.SKILL_MANAGEMENT.id,
-        loggingParams.apply { putString("action", SkillAction.DELETE.value) },
       )
     }
 
@@ -550,13 +535,6 @@ constructor(
     val updatedSkill =
       skill.toBuilder().setSelected(selected).setUserModifiedSelection(true).build()
 
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      getSkillLoggingParams(skill, featuredSkills).apply {
-        putString("action", if (selected) SkillAction.ENABLE.value else SkillAction.DISABLE.value)
-      },
-    )
-
     _skills.update { currentSkills ->
       currentSkills.map { curSkill ->
         if (curSkill.name == skill.name) {
@@ -587,15 +565,6 @@ constructor(
     Log.d(
       TAG,
       "Analytics: skill_management, action=${if (selected) SkillAction.ENABLE_ALL.value else SkillAction.DISABLE_ALL.value}",
-    )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.SKILL_MANAGEMENT.id,
-      Bundle().apply {
-        putString(
-          "action",
-          if (selected) SkillAction.ENABLE_ALL.value else SkillAction.DISABLE_ALL.value,
-        )
-      },
     )
 
     // Update data store.

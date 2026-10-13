@@ -140,7 +140,6 @@ import androidx.media3.exoplayer.PlayerMessage
 import androidx.media3.ui.PlayerView
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.common.clearFocusOnKeyboardDismiss
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.proto.VideoClip
 import com.google.ai.edge.gallery.proto.VideoMomentProject
 import com.google.ai.edge.gallery.proto.copy
@@ -426,7 +425,7 @@ fun ProjectDetailsScreen(
         // Close button on the left
         IconButton(
           onClick = {
-            logButtonClick("videomomentfinder_project_details_close")
+            
             cleanUp()
           },
           enabled = !isProcessing,
@@ -458,7 +457,7 @@ fun ProjectDetailsScreen(
         val hasSavedMoments = currentProject.savedClipsCount > 0
         IconButton(
           onClick = {
-            logButtonClick("videomomentfinder_open_saved_moments_drawer")
+            
             showSavedMomentsDrawer = true
           },
           enabled = hasSavedMoments,
@@ -630,7 +629,7 @@ private fun AnalysisFailedPanel(onRetryClick: () -> Unit) {
 
     FilledTonalButton(
       onClick = {
-        logButtonClick("videomomentfinder_retry_analysis")
+        
         onRetryClick()
       },
       contentPadding = SMALL_BUTTON_CONTENT_PADDING,
@@ -811,7 +810,7 @@ private fun MomentSearchPanel(
             if (searchQuery.trim().isNotEmpty()) {
               IconButton(
                 onClick = {
-                  logButtonClick("videomomentfinder_clear_search_query")
+                  
                   onSearchQueryChange("")
                   viewModel.clearSearchResults()
                 },
@@ -849,7 +848,7 @@ private fun MomentSearchPanel(
 
         FilledTonalIconButton(
           onClick = {
-            logButtonClick("videomomentfinder_open_config_dialog")
+            
             showConfigDialog = true
           },
           enabled = !uiState.isSearching,
@@ -867,7 +866,7 @@ private fun MomentSearchPanel(
         // translatable sentence lets other languages reorder it freely.
         AssistChip(
           onClick = {
-            logButtonClick("videomomentfinder_open_top_k_sheet")
+            
             showTopKSheet = true
           },
           label = {
@@ -967,7 +966,7 @@ private fun MomentSearchPanel(
                     RoundedCornerShape(8.dp),
                   )
                   .clickable {
-                    logButtonClick("videomomentfinder_select_search_result")
+                    
                     onResultClick(result)
                   }
             ) {
@@ -1055,7 +1054,7 @@ private fun MomentSearchPanel(
       if (uiState.selectedResultId != null) {
         FilledTonalButton(
           onClick = {
-            logButtonClick("videomomentfinder_save_or_edit_clip")
+            
             onSaveOrEditClipClick()
           },
           modifier =
@@ -1122,7 +1121,7 @@ private fun BoxScope.ScrubberAndControls(
       // Play / Pause toggle button.
       IconButton(
         onClick = {
-          logButtonClick(if (isPlaying) "videomomentfinder_pause" else "videomomentfinder_play")
+          
           onUserPlaybackInteraction()
           if (isPlaying) {
             exoPlayer.pause()
@@ -1158,7 +1157,7 @@ private fun BoxScope.ScrubberAndControls(
       // Mute / Unmute toggle button.
       IconButton(
         onClick = {
-          logButtonClick(if (isMuted) "videomomentfinder_unmute" else "videomomentfinder_mute")
+          
           exoPlayer.volume = if (isMuted) 1f else 0f
         }
       ) {
@@ -1326,7 +1325,7 @@ private fun SavedMomentsDrawer(
         )
         IconButton(
           onClick = {
-            logButtonClick("videomomentfinder_close_saved_moments_drawer")
+            
             onClose()
           },
           modifier = Modifier.size(48.dp),
@@ -1372,7 +1371,7 @@ private fun SavedMomentsDrawer(
             ClipThumbnailCard(
               clip = clip,
               onClick = {
-                logButtonClick("videomomentfinder_open_saved_clip_from_drawer")
+                
                 onClipClick(clip)
               },
               onDelete = { onDeleteClip(clip) },

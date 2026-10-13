@@ -66,7 +66,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.proto.VideoClip
 import com.google.ai.edge.gallery.ui.common.EmptyState
 
@@ -138,7 +137,7 @@ fun SavedMomentsTab(
           SavedMomentGroupCard(
             group = group,
             onClick = {
-              logButtonClick("videomomentfinder_open_moment_group")
+              
               selectedGroup = group
             },
             onDeleteAllClips = { viewModel.deleteClips(group.clips) },
@@ -154,7 +153,7 @@ fun SavedMomentsTab(
       SavedMomentsQueryBottomSheet(
         group = currentGroup,
         onClipClick = { item ->
-          logButtonClick("videomomentfinder_open_saved_clip_from_group")
+          
           selectedGroup = null
           onClipClick(item)
         },
@@ -242,7 +241,7 @@ private fun SavedMomentGroupCard(
             Icon(imageVector = Icons.Rounded.DeleteSweep, contentDescription = null)
           },
           onClick = {
-            logButtonClick("videomomentfinder_delete_all_clips_start")
+            
             showMenu = false
             showConfirmDeleteDialog = true
           },
@@ -284,12 +283,12 @@ private fun SavedMomentGroupCard(
     ConfirmDeleteDialog(
       message = stringResource(R.string.videomomentfinder_confirm_delete_all_clips),
       onConfirm = {
-        logButtonClick("videomomentfinder_delete_all_clips_confirm")
+        
         showConfirmDeleteDialog = false
         onDeleteAllClips()
       },
       onDismiss = { showConfirmDeleteDialog = false },
-      onCancelButtonClick = { logButtonClick("videomomentfinder_delete_all_clips_cancel") },
+      onCancelButtonClick = {  },
     )
   }
 }

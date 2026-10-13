@@ -55,7 +55,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.proto.VideoMomentProject
 import com.google.ai.edge.gallery.ui.common.EmptyState
 
@@ -111,7 +110,7 @@ fun ProjectListScreen(
               )
               .clip(RoundedCornerShape(16.dp))
               .clickable {
-                logButtonClick("videomomentfinder_add_video")
+                
                 onClickAdd()
               },
           contentAlignment = Alignment.Center,
@@ -136,7 +135,7 @@ fun ProjectListScreen(
       ProjectCard(
         project = project,
         onClick = {
-          logButtonClick("videomomentfinder_open_project")
+          
           onProjectClick(project)
         },
         onDeleteClick = { projectToDelete.value = it },
@@ -149,12 +148,12 @@ fun ProjectListScreen(
   if (toDelete != null) {
     ConfirmDeleteProjectDialog(
       onConfirm = {
-        logButtonClick("videomomentfinder_delete_project_confirm")
+        
         onDeleteClick(toDelete)
         projectToDelete.value = null
       },
       onDismiss = { projectToDelete.value = null },
-      onCancelButtonClick = { logButtonClick("videomomentfinder_delete_project_cancel") },
+      onCancelButtonClick = {  },
     )
   }
 }
@@ -184,7 +183,7 @@ fun ProjectCard(
           text = { Text(stringResource(R.string.delete)) },
           leadingIcon = { Icon(imageVector = Icons.Outlined.Delete, contentDescription = null) },
           onClick = {
-            logButtonClick("videomomentfinder_delete_project_start")
+            
             expanded = false
             onDeleteClick(project)
           },

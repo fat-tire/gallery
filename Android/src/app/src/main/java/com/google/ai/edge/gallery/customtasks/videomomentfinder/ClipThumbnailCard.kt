@@ -39,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.common.logButtonClick
 import com.google.ai.edge.gallery.proto.VideoClip
 
 /**
@@ -76,7 +75,6 @@ fun ClipThumbnailCard(
             text = { Text(stringResource(R.string.delete)) },
             leadingIcon = { Icon(imageVector = Icons.Outlined.Delete, contentDescription = null) },
             onClick = {
-              logButtonClick("videomomentfinder_delete_clip_start")
               showMenu = false
               showConfirmDeleteDialog = true
             },
@@ -101,12 +99,11 @@ fun ClipThumbnailCard(
   if (showConfirmDeleteDialog && onDelete != null) {
     ConfirmDeleteClipDialog(
       onConfirm = {
-        logButtonClick("videomomentfinder_delete_clip_confirm")
         showConfirmDeleteDialog = false
         onDelete()
       },
       onDismiss = { showConfirmDeleteDialog = false },
-      onCancelButtonClick = { logButtonClick("videomomentfinder_delete_clip_cancel") },
+      onCancelButtonClick = { },
     )
   }
 }

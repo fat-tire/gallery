@@ -18,9 +18,7 @@ package com.google.ai.edge.gallery.tools
 
 import android.os.Bundle
 import android.util.Log
-import com.google.ai.edge.gallery.GalleryEvent
 import com.google.ai.edge.gallery.common.convertStringToJsonObject
-import com.google.ai.edge.gallery.firebaseAnalytics
 import com.google.ai.edge.gallery.mcp.McpServersProvider
 import com.google.ai.edge.gallery.skills.SkillsProvider
 import com.google.ai.edge.litertlm.Tool
@@ -180,16 +178,6 @@ class RunMcpTool(
     Log.d(
       TAG,
       "Analytics: mcp_execution, capability_name=$taskId, success=$success, error_type=$errorType",
-    )
-    firebaseAnalytics?.logEvent(
-      GalleryEvent.MCP_EXECUTION.id,
-      Bundle().apply {
-        putString("capability_name", taskId)
-        putBoolean("success", success)
-        if (errorType.isNotEmpty()) {
-          putString("error_type", errorType)
-        }
-      },
     )
   }
 }
